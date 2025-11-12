@@ -10,5 +10,6 @@ run:
 	go run cmd/server/main.go --config=./config/dev.env
 
 .PHONY: test
+test:
 	go test -v ./...
 
