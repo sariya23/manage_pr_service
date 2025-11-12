@@ -9,6 +9,7 @@ import (
 
 type Config struct {
 	HTTPServerPort    int    `env:"HTTP_SERVER_PORT"`
+	HTTPServerHost    string `env:"HTTP_SERVER_HOST"`
 	PostgresUsername  string `env:"POSTGRES_USERNAME"`
 	PostgresPassword  string `env:"POSTGRES_PASSWORD"`
 	PostgresDB        string `env:"POSTGRES_DB"`
