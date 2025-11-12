@@ -14,10 +14,6 @@ import (
 	validators "github.com/sariya23/manage_pr_service/internal/validators/handlers/users"
 )
 
-const (
-	URLParamUserUserID = "userID"
-)
-
 func (i *UsersImplementation) GetReview(w http.ResponseWriter, r *http.Request, params api.GetUsersGetReviewRequestObject) {
 	ctx := r.Context()
 	const operationPlace = "handlers.users.GetReview"
