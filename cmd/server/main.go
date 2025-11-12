@@ -15,7 +15,11 @@ func main() {
 
 	r := chi.NewRouter()
 	debugImpl := apidebug.NewDebugImplementation()
-	r.Get("/api/ping", debugImpl.Ping)
+	r.Route("/api", func(r chi.Router) {
+		r.Route("/debug", func(r chi.Router) {
+			r.Get("/ping", debugImpl.Ping)
+		})
+	})
 
 	srv := server.NewServer(config.HTTPServerHost, config.HTTPServerPort, r)
 	srv.MustRun()
