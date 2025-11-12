@@ -2,6 +2,7 @@ package repo_user
 
 import (
 	"log/slog"
+	"strings"
 
 	"github.com/sariya23/manage_pr_service/internal/storage/database"
 )
@@ -11,6 +12,10 @@ const (
 	UserTableUsernameField = "username"
 	UserTableIsActiveField = "is_active"
 	UserTableName          = "user"
+)
+
+var (
+	UserAllFields = strings.Join([]string{UserTableUserIDField, UserTableUsernameField, UserTableIsActiveField}, ", ")
 )
 
 type UserRepository struct {
