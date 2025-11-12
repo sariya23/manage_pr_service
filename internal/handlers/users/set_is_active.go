@@ -10,8 +10,9 @@ import (
 	"github.com/go-chi/render"
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
-	"github.com/sariya23/manage_pr_service/internal/handlers"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
+	"github.com/sariya23/manage_pr_service/internal/utils/erresponse"
+	validators "github.com/sariya23/manage_pr_service/internal/validators/handlers/users"
 )
 
 func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request) {
@@ -22,11 +23,8 @@ func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request
 
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		log.Error("error decoding request body", slog.String("error", err.Error()))
-		errorResp := api.ErrorResponse{}
-		errorResp.Error.Code = handlers.NOT_FOUND
-		errorResp.Error.Message = "user not found"
 		w.WriteHeader(http.StatusBadRequest)
-		render.JSON(w, r, errorResp)
+		render.JSON(w, r, erresponse.MakeInvalidResponse("invalid json"))
 		return
 	}
 	defer func() {
@@ -35,46 +33,24 @@ func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request
 		}
 	}()
 
-	if request.UserId == "" {
-		log.Warn("empty user_id")
-		errorResp := api.ErrorResponse{}
-		errorResp.Error.Code = handlers.MISSING_REQUIRED_FIELD
-		errorResp.Error.Message = "user_id is required"
+	if msg, valid := validators.ValidateSetIsActiveUserRequest(request); !valid {
+		log.Warn("invalid request", slog.String("user_id", request.UserId), slog.String("message", msg))
 		w.WriteHeader(http.StatusBadRequest)
-		render.JSON(w, r, errorResp)
+		render.JSON(w, r, erresponse.MakeInvalidResponse(msg))
 		return
 	}
-
-	userID, err := strconv.Atoi(request.UserId)
-	if err != nil {
-		log.Warn("user_id is not an integer",
-			slog.String("user_id", request.UserId),
-			slog.String("error", err.Error()))
-		errorResp := api.ErrorResponse{}
-		errorResp.Error.Code = handlers.TYPE_MISMATCH
-		errorResp.Error.Message = "user_id must be an integer"
-		w.WriteHeader(http.StatusBadRequest)
-		render.JSON(w, r, errorResp)
-		return
-	}
-
+	userID, _ := strconv.Atoi(request.UserId)
 	domainUser, err := i.userService.SetIsActive(ctx, int64(userID), request.IsActive)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {
 			log.Warn("user not found", slog.String("user_id", request.UserId))
-			errorResp := api.ErrorResponse{}
-			errorResp.Error.Code = handlers.NOT_FOUND
-			errorResp.Error.Message = "user not found"
 			w.WriteHeader(http.StatusNotFound)
-			render.JSON(w, r, errorResp)
+			render.JSON(w, r, erresponse.MakeInvalidResponse("user not found"))
 			return
 		}
 		log.Error("unexpected error", slog.String("user_id", request.UserId), slog.String("error", err.Error()))
-		errorResp := api.ErrorResponse{}
-		errorResp.Error.Code = handlers.INTERNAL
-		errorResp.Error.Message = "internal error"
 		w.WriteHeader(http.StatusInternalServerError)
-		render.JSON(w, r, errorResp)
+		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
 		return
 	}
 
