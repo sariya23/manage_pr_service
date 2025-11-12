@@ -7,10 +7,10 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/models"
 )
 
-func DomainUserToIsActiveResponseUser(domainUser models.User) api.PostUsersSetIsActive200JSONResponse {
-	var res api.PostUsersSetIsActive200JSONResponse
-	res.User.UserId = strconv.Itoa(int(domainUser.UserID))
-	res.User.TeamName = domainUser.TeamName
-	res.User.IsActive = domainUser.IsActive
+func DomainUserToIsActiveResponseUser(domainUser models.User) api.User {
+	var res api.User
+	res.UserId = strconv.Itoa(int(domainUser.UserID))
+	res.TeamName = domainUser.TeamName
+	res.IsActive = domainUser.IsActive
 	return res
 }

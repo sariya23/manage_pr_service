@@ -43,12 +43,12 @@ func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request
 	domainUser, err := i.userService.SetIsActive(ctx, int64(userID), request.IsActive)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {
-			log.Warn("user not found", slog.String("user_id", request.UserId))
+			log.Warn("user not found", slog.Int("user_id", userID))
 			w.WriteHeader(http.StatusNotFound)
 			render.JSON(w, r, erresponse.MakeInvalidResponse("user not found"))
 			return
 		}
-		log.Error("unexpected error", slog.String("user_id", request.UserId), slog.String("error", err.Error()))
+		log.Error("unexpected error", slog.Int("user_id", userID), slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
 		return
@@ -56,6 +56,6 @@ func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request
 
 	responseUser := converters.DomainUserToIsActiveResponseUser(domainUser)
 	w.WriteHeader(http.StatusOK)
-	render.JSON(w, r, responseUser)
+	render.JSON(w, r, api.PostUsersSetIsActive200JSONResponse{User: &responseUser})
 	return
 }
