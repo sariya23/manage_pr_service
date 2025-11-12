@@ -1,0 +1,18 @@
+package models
+
+import "time"
+
+type PullRequestStatus string
+
+const (
+	PULL_REQUEST_STATUS_OPEN   PullRequestStatus = "OPEN"
+	PULL_REQUEST_STATUS_MERGED PullRequestStatus = "MERGED"
+)
+
+type PullRequest struct {
+	PullRequestID int64
+	Name          string
+	AuthorID      int64
+	Status        PullRequestStatus
+	MergedAt      time.Time
+}

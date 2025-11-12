@@ -28,6 +28,7 @@ func main() {
 		})
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/setIsActive", userImpl.SetIsActive)
+			r.Get("/getReview/{userID}", userImpl.GetReview)
 		})
 	})
 

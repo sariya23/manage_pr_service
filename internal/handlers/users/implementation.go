@@ -9,6 +9,7 @@ import (
 
 type userService interface {
 	SetIsActive(ctx context.Context, userId int64, isActive bool) (models.User, error)
+	GetUserReviews(ctx context.Context, userId int64) ([]models.PullRequest, error)
 }
 
 type UsersImplementation struct {
