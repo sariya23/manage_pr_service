@@ -8,7 +8,7 @@ import (
 
 func ValidateSetIsActiveUserRequest(request api.PostUsersSetIsActiveJSONRequestBody) (string, bool) {
 	if request.UserId == "" {
-		return "user_id required", false
+		return "user_id is required", false
 	}
 
 	userID, err := strconv.Atoi(request.UserId)
