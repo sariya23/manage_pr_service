@@ -9,7 +9,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/app/server"
 	cfg "github.com/sariya23/manage_pr_service/internal/config"
 	apidebug "github.com/sariya23/manage_pr_service/internal/handlers/debug"
-	apiuser "github.com/sariya23/manage_pr_service/internal/handlers/user"
+	apiusers "github.com/sariya23/manage_pr_service/internal/handlers/users"
 	serviceuser "github.com/sariya23/manage_pr_service/internal/service/user"
 )
 
@@ -21,7 +21,7 @@ func main() {
 	r := chi.NewRouter()
 	userService := serviceuser.NewUserService()
 	debugImpl := apidebug.NewDebugImplementation()
-	userImpl := apiuser.NewUsersImplementation(logger, userService)
+	userImpl := apiusers.NewUsersImplementation(logger, userService)
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/debug", func(r chi.Router) {
 			r.Get("/ping", debugImpl.Ping)

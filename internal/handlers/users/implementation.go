@@ -1,8 +1,14 @@
-package apiuser
+package apiusers
 
-import "log/slog"
+import (
+	"context"
+	"log/slog"
+
+	"github.com/sariya23/manage_pr_service/internal/models"
+)
 
 type userService interface {
+	SetIsActive(ctx context.Context, userId int64, isActive bool) (models.User, error)
 }
 
 type UsersImplementation struct {
