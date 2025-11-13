@@ -9,6 +9,7 @@ import (
 
 type TeamService interface {
 	Add(ctx context.Context, teamName string, members []domain.User) ([]domain.User, error)
+	Get(ctx context.Context, teamName string) ([]domain.User, error)
 }
 
 type TeamsImplementation struct {

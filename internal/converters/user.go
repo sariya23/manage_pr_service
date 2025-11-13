@@ -37,3 +37,15 @@ func MultiDomainUserToAddTeamResponse(domainUser []domain.User) []api.TeamMember
 	}
 	return res
 }
+
+func MultiDomainUserToGetTeamResponse(domainUser []domain.User) []api.TeamMember {
+	res := make([]api.TeamMember, 0, len(domainUser))
+	for _, user := range domainUser {
+		res = append(res, api.TeamMember{
+			UserId:   user.UserID,
+			Username: user.Username,
+			IsActive: user.IsActive,
+		})
+	}
+	return res
+}
