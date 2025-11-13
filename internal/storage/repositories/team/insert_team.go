@@ -16,11 +16,13 @@ func (r *TeamRepository) InsertTeam(ctx context.Context, teamName string, users 
 		TeamTableName,
 		TeamTableTeamNameField)
 
-	insertTeamMemberSQL := fmt.Sprintf("insert into %s values ", TeamMemberTableName)
+	insertTeamMemberSQL := strings.Builder{}
+	insertTeamMemberSQL.WriteString(fmt.Sprintf("insert into %s values ", TeamMemberTableName))
 	insertTeamMemberArgs := make([]interface{}, 0, len(users)*2)
 	insertTeamMemberValues := make([]string, 0, len(users))
 
-	insertUsersSQL := fmt.Sprintf("insert into \"%s\" values ", repo_user.UserTableName)
+	insertUsersSQL := strings.Builder{}
+	insertUsersSQL.WriteString(fmt.Sprintf("insert into \"%s\" values ", repo_user.UserTableName))
 	insertUsersArgs := make([]interface{}, 0, len(users)*3)
 	insertUsersValues := make([]string, 0, len(users))
 
@@ -37,9 +39,9 @@ func (r *TeamRepository) InsertTeam(ctx context.Context, teamName string, users 
 				len(insertTeamMemberArgs)+2))
 		insertTeamMemberArgs = append(insertTeamMemberArgs, teamName, user.UserID)
 	}
-	insertTeamMemberSQL += strings.Join(insertTeamMemberValues, ", ")
-	insertUsersSQL += strings.Join(insertUsersValues, ", ")
-	insertUsersSQL += fmt.Sprintf(" on conflict (%s) do nothing", repo_user.UserTableUserIDField)
+	insertTeamMemberSQL.WriteString(strings.Join(insertTeamMemberValues, ", "))
+	insertUsersSQL.WriteString(strings.Join(insertUsersValues, ", "))
+	insertUsersSQL.WriteString(fmt.Sprintf(" on conflict (%s) do nothing", repo_user.UserTableUserIDField))
 
 	tx, err := r.conn.GetPool().Begin(ctx)
 	if err != nil {
@@ -51,20 +53,17 @@ func (r *TeamRepository) InsertTeam(ctx context.Context, teamName string, users 
 
 	_, err = tx.Exec(ctx, insertTeamSQL, teamName)
 	if err != nil {
-		fmt.Println("upsertTeamSQL")
-		return fmt.Errorf("%s: %w", operationPlace, err)
+		return fmt.Errorf("%s:insertTeamSQL: %w", operationPlace, err)
 	}
 
-	_, err = tx.Exec(ctx, insertUsersSQL, insertUsersArgs...)
+	_, err = tx.Exec(ctx, insertUsersSQL.String(), insertUsersArgs...)
 	if err != nil {
-		fmt.Println("upsertUsersSQL")
-		return fmt.Errorf("%s: %w", operationPlace, err)
+		return fmt.Errorf("%s:insertUsersSQL: %w", operationPlace, err)
 	}
 
-	_, err = tx.Exec(ctx, insertTeamMemberSQL, insertTeamMemberArgs...)
+	_, err = tx.Exec(ctx, insertTeamMemberSQL.String(), insertTeamMemberArgs...)
 	if err != nil {
-		fmt.Println("insertTeamMemberSQL")
-		return fmt.Errorf("%s: %w", operationPlace, err)
+		return fmt.Errorf("%s:insertTeamMemberSQL: %w", operationPlace, err)
 	}
 
 	err = tx.Commit(ctx)
