@@ -31,5 +31,4 @@ func (i *TeamsImplementation) Add(w http.ResponseWriter, r *http.Request) {
 	// team_name = ""
 	// validate user id
 	// validate username
-	// validate is_active
 }

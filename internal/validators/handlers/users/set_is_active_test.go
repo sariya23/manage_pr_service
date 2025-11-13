@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSetIsActive(t *testing.T) {
+func TestValidateSetIsActiveUserRequest(t *testing.T) {
 	cases := []struct {
 		name          string
 		request       api.PostUsersSetIsActiveJSONRequestBody

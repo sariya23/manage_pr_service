@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetReview(t *testing.T) {
+func TestValidateGetUserReviewRequest(t *testing.T) {
 	cases := []struct {
 		name          string
 		request       api.GetUsersGetReviewRequestObject
