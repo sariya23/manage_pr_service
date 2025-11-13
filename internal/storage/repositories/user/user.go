@@ -1,8 +1,6 @@
 package repo_user
 
 import (
-	"log/slog"
-
 	"github.com/sariya23/manage_pr_service/internal/storage/database"
 )
 
@@ -17,12 +15,10 @@ const (
 
 type UserRepository struct {
 	conn *database.Database
-	log  *slog.Logger
 }
 
-func NewUserRepository(conn *database.Database, log *slog.Logger) *UserRepository {
+func NewUserRepository(conn *database.Database) *UserRepository {
 	return &UserRepository{
 		conn: conn,
-		log:  log,
 	}
 }

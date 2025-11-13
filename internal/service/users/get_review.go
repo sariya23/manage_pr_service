@@ -10,7 +10,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
 
-func (s *UsersService) GetReview(ctx context.Context, userID string) ([]domain.PullRequest, error) {
+func (s *UsersService) GetReviews(ctx context.Context, userID string) ([]domain.PullRequest, error) {
 	const operationPlace = "service.users.GetReview"
 	log := s.log.With("operationPlace", operationPlace)
 	_, err := s.userRepo.GetUserByID(ctx, userID)

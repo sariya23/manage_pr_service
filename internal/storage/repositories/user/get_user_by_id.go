@@ -13,7 +13,7 @@ import (
 func (u *UserRepository) GetUserByID(ctx context.Context, userID string) (*domain.User, error) {
 	const operationPlace = "storage.repositories.user.GetUserByID"
 
-	getUserSQL := fmt.Sprintf("select %s, %s, %s from '%s' where %s=$1",
+	getUserSQL := fmt.Sprintf("select %s, %s, %s from \"%s\" where %s=$1",
 		UserTableUserIDField,
 		UserTableUsernameField,
 		UserTableIsActiveField,

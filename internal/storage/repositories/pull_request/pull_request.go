@@ -1,8 +1,6 @@
 package repo_pull_request
 
 import (
-	"log/slog"
-
 	"github.com/sariya23/manage_pr_service/internal/storage/database"
 )
 
@@ -20,12 +18,10 @@ const (
 
 type PullRequestRepository struct {
 	conn *database.Database
-	log  *slog.Logger
 }
 
-func NewPullRequestRepository(conn *database.Database, log *slog.Logger) *PullRequestRepository {
+func NewPullRequestRepository(conn *database.Database) *PullRequestRepository {
 	return &PullRequestRepository{
 		conn: conn,
-		log:  log,
 	}
 }

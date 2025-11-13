@@ -52,7 +52,7 @@ func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	responseUser := converters.DomainUserToIsActiveResponseUser(domainUser)
+	responseUser := converters.DomainUserToIsActiveResponseUser(*domainUser)
 	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, api.PostUsersSetIsActive200JSONResponse{User: &responseUser})
 	return

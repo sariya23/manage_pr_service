@@ -8,8 +8,8 @@ import (
 )
 
 type userService interface {
-	SetIsActive(ctx context.Context, userId string, isActive bool) (domain.User, error)
-	GetUserReviews(ctx context.Context, userId string) ([]domain.PullRequest, error)
+	SetIsActive(ctx context.Context, userId string, isActive bool) (*domain.User, error)
+	GetReviews(ctx context.Context, userId string) ([]domain.PullRequest, error)
 }
 
 type UsersImplementation struct {

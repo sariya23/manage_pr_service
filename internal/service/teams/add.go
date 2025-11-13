@@ -70,7 +70,7 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 		}
 	}
 
-	err = s.teamRepository.UpsertTeam(ctx, teamName, membersRequest)
+	err = s.teamRepository.InsertTeam(ctx, teamName, membersRequest)
 	if err != nil {
 		log.Error("failed to upsert team", slog.String("teamname", teamName), slog.String("error", err.Error()))
 		return nil, fmt.Errorf("%s: %w", operationPlace, err)

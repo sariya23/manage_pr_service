@@ -14,18 +14,21 @@ import (
 	validators "github.com/sariya23/manage_pr_service/internal/validators/handlers/users"
 )
 
-func (i *UsersImplementation) GetReview(w http.ResponseWriter, r *http.Request, params api.GetUsersGetReviewRequestObject) {
+func (i *UsersImplementation) GetReview(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	const operationPlace = "handlers.users.GetReview"
 	log := i.logger.With("operationPlace", operationPlace)
-
+	query := r.URL.Query()
+	userID := query.Get("user_id")
+	params := api.GetUsersGetReviewRequestObject{}
+	params.Params = api.GetUsersGetReviewParams{UserId: userID}
 	if msg, valid := validators.ValidateGetUserReviewRequest(params); !valid {
 		log.Warn("invalid request", slog.String("user_id", params.Params.UserId), slog.String("message", msg))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse(msg))
 	}
 
-	pullRequests, err := i.userService.GetUserReviews(ctx, params.Params.UserId)
+	pullRequests, err := i.userService.GetReviews(ctx, params.Params.UserId)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {
 			log.Warn("user not found", slog.String("user_id", params.Params.UserId))

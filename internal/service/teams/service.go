@@ -10,7 +10,7 @@ import (
 type TeamRepository interface {
 	GetUserTeam(ctx context.Context, userID string) (string, error)
 	GetTeamMemberIDs(ctx context.Context, teamName string) ([]string, error)
-	UpsertTeam(ctx context.Context, teamName string, users []domain.User) error
+	InsertTeam(ctx context.Context, teamName string, users []domain.User) error
 }
 
 type UserRepository interface {
