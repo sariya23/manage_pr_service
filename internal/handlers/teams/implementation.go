@@ -5,11 +5,10 @@ import (
 	"log/slog"
 
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
-	"github.com/sariya23/manage_pr_service/internal/models/dto"
 )
 
 type TeamService interface {
-	Add(ctx context.Context, teamName string, members []dto.TeamMember) ([]domain.User, error)
+	Add(ctx context.Context, teamName string, members []domain.User) ([]domain.User, error)
 }
 
 type TeamsImplementation struct {

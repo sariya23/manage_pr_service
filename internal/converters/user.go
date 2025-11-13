@@ -12,3 +12,28 @@ func DomainUserToIsActiveResponseUser(domainUser domain.User) api.User {
 	res.IsActive = domainUser.IsActive
 	return res
 }
+
+func MultiAddTeamUserToDomainUser(dto []api.TeamMember) []domain.User {
+	res := make([]domain.User, 0, len(dto))
+
+	for _, member := range dto {
+		res = append(res, domain.User{
+			UserID:   member.UserId,
+			Username: member.Username,
+			IsActive: member.IsActive,
+		})
+	}
+	return res
+}
+
+func MultiDomainUserToAddTeamResponse(domainUser []domain.User) []api.TeamMember {
+	res := make([]api.TeamMember, 0, len(domainUser))
+	for _, user := range domainUser {
+		res = append(res, api.TeamMember{
+			UserId:   user.UserID,
+			Username: user.Username,
+			IsActive: user.IsActive,
+		})
+	}
+	return res
+}
