@@ -7,10 +7,12 @@ import (
 )
 
 const (
-	UserTableUserIDField   = "user_id"
-	UserTableUsernameField = "username"
-	UserTableIsActiveField = "is_active"
-	UserTableName          = "user"
+	UserTableUserIDField    = "user_id"
+	UserTableUsernameField  = "username"
+	UserTableIsActiveField  = "is_active"
+	UserTableCreatedAtField = "created_at"
+	UserTableUpdatedAtField = "updated_at"
+	UserTableName           = "user"
 )
 
 type UserRepository struct {

@@ -13,9 +13,10 @@ import (
 func (u *UserRepository) SetIsActive(ctx context.Context, userID int64, isActive bool) (*domain.User, error) {
 	const operationPlace = "storage.repositories.user.SetIsActive"
 
-	setIsActiveSQL := fmt.Sprintf("update '%s' set %s=$1 where %s=$2 returning %s, %s, %s",
+	setIsActiveSQL := fmt.Sprintf("update '%s' set %s=$1, %s=current_timestamp where %s=$2 returning %s, %s, %s",
 		UserTableName,
 		UserTableIsActiveField,
+		UserTableUpdatedAtField,
 		UserTableUserIDField,
 		UserTableUserIDField,
 		UserTableUsernameField,

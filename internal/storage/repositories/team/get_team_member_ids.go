@@ -8,10 +8,12 @@ import (
 func (r *TeamRepository) GetTeamMemberIDs(ctx context.Context, teamName string) ([]string, error) {
 	const operationPlace = "storage.repositories.team.GetTeamMemberIDs"
 
-	getTeamMembersSQL := fmt.Sprintf("select %s from %s where %s=$1",
-		TeamUserIDField,
+	getTeamMembersSQL := fmt.Sprintf("select %s from %s join %s using(%s) where %s=$1",
+		TeamMemberTableUserIDField,
 		TeamTableName,
-		TeamTeamNameField)
+		TeamMemberTableName,
+		TeamTableTeamNameField,
+		TeamTableTeamNameField)
 
 	var userIDs []string
 

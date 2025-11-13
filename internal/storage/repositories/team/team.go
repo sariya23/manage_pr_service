@@ -7,9 +7,11 @@ import (
 )
 
 const (
-	TeamUserIDField   = "user_id"
-	TeamTeamNameField = "team_name"
-	TeamTableName     = "teaam"
+	TeamTableName                = "team"
+	TeamMemberTableName          = "team_member"
+	TeamTableTeamNameField       = "team_name"
+	TeamMemberTableTeamNameField = "team_name"
+	TeamMemberTableUserIDField   = "user_id"
 )
 
 type TeamRepository struct {
