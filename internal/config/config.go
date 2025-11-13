@@ -14,8 +14,8 @@ type Config struct {
 	PostgresPassword  string `env:"POSTGRES_PASSWORD"`
 	PostgresDB        string `env:"POSTGRES_DB"`
 	PostgresPort      int    `env:"POSTGRES_PORT"`
-	PostgresInnerHost string `env:"POSTGRES_HOST_INNER_HOST"`
-	PostgresOuterHost string `env:"POSTGRES_HOST_OUTER_HOST"`
+	PostgresInnerHost string `env:"POSTGRES_HOST_INNER"`
+	PostgresOuterHost string `env:"POSTGRES_HOST_OUTER"`
 	SSLMode           string `env:"SSL_MODE"`
 	ConfigPath        string `env:"CONFIG_PATH"`
 }

@@ -1,7 +1,5 @@
 package domain
 
-import "time"
-
 type PullRequestStatus string
 
 const (
@@ -14,5 +12,4 @@ type PullRequest struct {
 	Name          string
 	AuthorID      int64
 	Status        PullRequestStatus
-	MergedAt      time.Time
 }
