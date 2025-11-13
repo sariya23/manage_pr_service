@@ -18,7 +18,7 @@ func TestGetReview(t *testing.T) {
 			name:          "Empty user id",
 			request:       api.GetUsersGetReviewRequestObject{Params: api.GetUsersGetReviewParams{UserId: ""}},
 			expectedValid: false,
-			expectedMsg:   "missing query param 'user_id'",
+			expectedMsg:   "user_id is required",
 		},
 		{
 			name:          "User id not numeric",

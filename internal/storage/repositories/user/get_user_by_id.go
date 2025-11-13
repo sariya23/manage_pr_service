@@ -18,6 +18,7 @@ func (u *UserRepository) GetUserByID(ctx context.Context, userID int64) (*models
 		UserTableUsernameField,
 		UserTableIsActiveField,
 		UserTableName,
+		UserTableUserIDField,
 	)
 
 	var user models.User
