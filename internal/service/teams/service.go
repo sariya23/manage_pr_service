@@ -9,7 +9,6 @@ import (
 
 type TeamRepository interface {
 	GetUserTeam(ctx context.Context, userID string) (string, error)
-	IsExists(context.Context, string) (bool, error)
 	GetTeamMemberIDs(ctx context.Context, teamName string) ([]string, error)
 	UpsertTeam(ctx context.Context, teamName string, users []domain.User) error
 }

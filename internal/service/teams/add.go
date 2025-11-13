@@ -14,22 +14,16 @@ import (
 func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest []domain.User) ([]domain.User, error) {
 	const operationPlace = "service.users.GetReview"
 	log := s.log.With("operationPlace", operationPlace)
-	teamExist, err := s.teamRepository.IsExists(ctx, teamName)
+	teamUserIDs, err := s.teamRepository.GetTeamMemberIDs(ctx, teamName)
 	if err != nil {
 		log.Error("failed to check team existence",
 			slog.String("teamname", teamName),
 			slog.String("error", err.Error()))
 		return nil, fmt.Errorf("%s: %w", operationPlace, err)
+
 	}
 
-	if teamExist {
-		teamUserIDs, err := s.teamRepository.GetTeamMemberIDs(ctx, teamName)
-		if err != nil {
-			log.Error("failed to get team user ids",
-				slog.String("teamname", teamName),
-				slog.String("error", err.Error()))
-			return nil, fmt.Errorf("%s: %w", operationPlace, err)
-		}
+	if len(teamUserIDs) > 0 {
 		for _, memberReq := range membersRequest {
 			if slices.Contains(teamUserIDs, memberReq.UserID) {
 				log.Warn("team already exists", slog.String("teamname", teamName))
@@ -48,11 +42,13 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 		if err != nil {
 			if errors.Is(err, outerror.ErrUserNotFound) {
 				isUserExists = false
+			} else {
+				log.Error("failed to check user existence",
+					slog.String("user_id", member.UserID),
+					slog.String("error", err.Error()))
+				return nil, fmt.Errorf("%s: %w", operationPlace, err)
 			}
-			log.Error("failed to check user existence",
-				slog.String("user_id", member.UserID),
-				slog.String("error", err.Error()))
-			return nil, fmt.Errorf("%s: %w", operationPlace, err)
+
 		}
 		if isUserExists {
 			_, err := s.teamRepository.GetUserTeam(ctx, member.UserID)
@@ -60,11 +56,12 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 			if err != nil {
 				if errors.Is(err, outerror.ErrUserNotFound) {
 					isUserInTeam = false
+				} else {
+					log.Error("failed to check user membership in team",
+						slog.String("user_id", member.UserID),
+						slog.String("error", err.Error()))
+					return nil, fmt.Errorf("%s: %w", operationPlace, err)
 				}
-				log.Error("failed to check user membership in team",
-					slog.String("user_id", member.UserID),
-					slog.String("error", err.Error()))
-				return nil, fmt.Errorf("%s: %w", operationPlace, err)
 			}
 			if isUserInTeam {
 				log.Warn("user is already a member of some team", slog.String("user_id", member.UserID))
