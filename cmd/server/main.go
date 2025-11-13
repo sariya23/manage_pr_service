@@ -39,7 +39,7 @@ func main() {
 	userRepo := repo_user.NewUserRepository(db)
 	teamRepo := repo_team.NewTeamRepository(db)
 	pullRequestRepo := repo_pull_request.NewPullRequestRepository(db)
-	userService := serviceusers.NewUsersService(logger, userRepo, pullRequestRepo)
+	userService := serviceusers.NewUsersService(logger, userRepo, pullRequestRepo, teamRepo)
 	teamService := serviceteams.NewTeamsService(logger, teamRepo, userRepo)
 	debugImpl := apidebug.NewDebugImplementation()
 	userImpl := apiusers.NewUsersImplementation(logger, userService)

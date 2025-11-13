@@ -12,9 +12,9 @@ import (
 )
 
 func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest []domain.User) ([]domain.User, error) {
-	const operationPlace = "service.users.GetReview"
+	const operationPlace = "service.teams.Add"
 	log := s.log.With("operationPlace", operationPlace)
-	teamUserIDs, err := s.teamRepository.GetTeamMemberIDs(ctx, teamName)
+	members, err := s.teamRepository.GetTeamMembers(ctx, teamName)
 	if err != nil {
 		log.Error("failed to check team existence",
 			slog.String("teamname", teamName),
@@ -23,9 +23,9 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 
 	}
 
-	if len(teamUserIDs) > 0 {
+	if len(members) > 0 {
 		for _, memberReq := range membersRequest {
-			if slices.Contains(teamUserIDs, memberReq.UserID) {
+			if slices.Contains(domain.UserIDs(members), memberReq.UserID) {
 				log.Warn("team already exists", slog.String("teamname", teamName))
 				return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrTeamAlreadyExists)
 			}

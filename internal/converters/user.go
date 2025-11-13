@@ -5,10 +5,11 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
 )
 
-func DomainUserToIsActiveResponseUser(domainUser domain.User) api.User {
+func DomainUserToIsActiveResponseUser(domainUser domain.User, teamName string) api.User {
 	var res api.User
 	res.UserId = domainUser.UserID
-	res.TeamName = domainUser.TeamName
+	res.TeamName = teamName
+	res.Username = domainUser.Username
 	res.IsActive = domainUser.IsActive
 	return res
 }

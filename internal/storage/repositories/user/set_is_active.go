@@ -23,7 +23,7 @@ func (u *UserRepository) SetIsActive(ctx context.Context, userID string, isActiv
 		UserTableIsActiveField,
 	)
 	var user domain.User
-	row := u.conn.GetPool().QueryRow(ctx, setIsActiveSQL, userID, isActive)
+	row := u.conn.GetPool().QueryRow(ctx, setIsActiveSQL, isActive, userID)
 	err := row.Scan(&user.UserID, &user.Username, &user.IsActive)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

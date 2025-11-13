@@ -52,7 +52,17 @@ func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	responseUser := converters.DomainUserToIsActiveResponseUser(*domainUser)
+	teamName, err := i.userService.GetUserTeam(ctx, domainUser.UserID)
+	if err != nil {
+		if !errors.Is(err, outerror.ErrUserNotFound) {
+			log.Error("unexpected error", slog.String("user_id", domainUser.UserID))
+			w.WriteHeader(http.StatusInternalServerError)
+			render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
+			return
+		}
+	}
+
+	responseUser := converters.DomainUserToIsActiveResponseUser(*domainUser, teamName)
 	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, api.PostUsersSetIsActive200JSONResponse{User: &responseUser})
 	return

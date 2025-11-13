@@ -16,16 +16,22 @@ type ReviewUserPullRequestRepository interface {
 	GetUserReviews(ctx context.Context, userID string) ([]domain.PullRequest, error)
 }
 
+type TeamRepository interface {
+	GetUserTeam(ctx context.Context, userID string) (string, error)
+}
+
 type UsersService struct {
 	log            *slog.Logger
 	userRepo       UserRepository
 	reviewUserRepo ReviewUserPullRequestRepository
+	teamRepo       TeamRepository
 }
 
-func NewUsersService(log *slog.Logger, userRepo UserRepository, reviewUserRepo ReviewUserPullRequestRepository) *UsersService {
+func NewUsersService(log *slog.Logger, userRepo UserRepository, reviewUserRepo ReviewUserPullRequestRepository, teamRepo TeamRepository) *UsersService {
 	return &UsersService{
 		log:            log,
 		userRepo:       userRepo,
 		reviewUserRepo: reviewUserRepo,
+		teamRepo:       teamRepo,
 	}
 }

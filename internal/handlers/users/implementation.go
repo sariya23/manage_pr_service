@@ -10,6 +10,7 @@ import (
 type userService interface {
 	SetIsActive(ctx context.Context, userId string, isActive bool) (*domain.User, error)
 	GetReviews(ctx context.Context, userId string) ([]domain.PullRequest, error)
+	GetUserTeam(ctx context.Context, userID string) (string, error)
 }
 
 type UsersImplementation struct {

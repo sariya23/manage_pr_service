@@ -21,8 +21,9 @@ func (r *TeamRepository) GetUserTeam(ctx context.Context, userID string) (string
 	)
 
 	var teamName string
+	fmt.Println(getUserTeamSQL)
 	row := r.conn.GetPool().QueryRow(ctx, getUserTeamSQL, userID)
-	err := row.Scan(teamName)
+	err := row.Scan(&teamName)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return "", fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserNotFound)

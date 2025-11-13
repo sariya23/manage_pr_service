@@ -43,5 +43,5 @@ func (i *UsersImplementation) GetReview(w http.ResponseWriter, r *http.Request) 
 
 	prResponse := converters.MultiDomainPullRequestToGetReviewResponse(pullRequests)
 	w.WriteHeader(http.StatusOK)
-	render.JSON(w, r, api.GetUsersGetReview200JSONResponse{PullRequests: prResponse, UserId: params.Params.UserId})
+	render.JSON(w, r, api.GetUsersGetReview200JSONResponse{PullRequests: prResponse, UserId: userID})
 }
