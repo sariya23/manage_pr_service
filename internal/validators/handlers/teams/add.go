@@ -1,4 +1,4 @@
-package validators
+package teamsvalidators
 
 import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
@@ -15,11 +15,11 @@ func ValidateTeamAddRequest(request api.PostTeamAddJSONRequestBody) (string, boo
 	}
 
 	for _, member := range request.Members {
-		if msg, valid := validators.ValidateUserID(member.UserId); !valid {
-			return msg, false
-		}
 		if member.Username == "" {
 			return "username is required", false
+		}
+		if msg, valid := validators.ValidateUserID(member.UserId); !valid {
+			return msg, false
 		}
 	}
 	return "OK", true

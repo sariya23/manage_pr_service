@@ -1,4 +1,4 @@
-package validators
+package teamsvalidators
 
 import (
 	"testing"
@@ -55,30 +55,6 @@ func TestValidateTeamAddRequest(t *testing.T) {
 			},
 			expectedValid: false,
 			expectedMsg:   "user_id is required",
-		},
-		{
-			name: "negative user_id",
-			request: api.PostTeamAddJSONRequestBody{
-				TeamName: "Test",
-				Members: []api.TeamMember{
-					{IsActive: true, Username: "test", UserId: "-123"},
-					{IsActive: true, Username: "test", UserId: "123"},
-				},
-			},
-			expectedValid: false,
-			expectedMsg:   "user_id must be positive",
-		},
-		{
-			name: "not numeric user_id",
-			request: api.PostTeamAddJSONRequestBody{
-				TeamName: "Test",
-				Members: []api.TeamMember{
-					{IsActive: true, Username: "test", UserId: "asd"},
-					{IsActive: true, Username: "test", UserId: "123"},
-				},
-			},
-			expectedValid: false,
-			expectedMsg:   "user_id must be numeric",
 		},
 		{
 			name:          "no members",

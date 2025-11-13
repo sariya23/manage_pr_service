@@ -1,8 +1,7 @@
-package models
+package dto
 
-type User struct {
+type TeamMember struct {
 	UserID   int64
 	Username string
-	TeamName string
 	IsActive bool
 }

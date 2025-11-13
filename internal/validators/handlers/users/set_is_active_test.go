@@ -1,4 +1,4 @@
-package validators
+package usersvalidators
 
 import (
 	"testing"
@@ -19,18 +19,6 @@ func TestValidateSetIsActiveUserRequest(t *testing.T) {
 			request:       api.PostUsersSetIsActiveJSONRequestBody{IsActive: false, UserId: ""},
 			expectedValid: false,
 			expectedMsg:   "user_id is required",
-		},
-		{
-			name:          "User id not numeric",
-			request:       api.PostUsersSetIsActiveJSONRequestBody{IsActive: false, UserId: "ABOBA"},
-			expectedValid: false,
-			expectedMsg:   "user_id must be numeric",
-		},
-		{
-			name:          "User id is negative",
-			request:       api.PostUsersSetIsActiveJSONRequestBody{IsActive: false, UserId: "-123"},
-			expectedValid: false,
-			expectedMsg:   "user_id must be positive",
 		},
 		{
 			name:          "OK",

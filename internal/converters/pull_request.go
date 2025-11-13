@@ -4,10 +4,10 @@ import (
 	"strconv"
 
 	api "github.com/sariya23/manage_pr_service/internal/generated"
-	"github.com/sariya23/manage_pr_service/internal/models"
+	"github.com/sariya23/manage_pr_service/internal/models/domain"
 )
 
-func DomainPullRequestToGetReviewResponse(domainPR models.PullRequest) api.PullRequestShort {
+func DomainPullRequestToGetReviewResponse(domainPR domain.PullRequest) api.PullRequestShort {
 	var res api.PullRequestShort
 	res.PullRequestId = strconv.Itoa(int(domainPR.PullRequestID))
 	res.AuthorId = strconv.Itoa(int(domainPR.AuthorID))
@@ -16,7 +16,7 @@ func DomainPullRequestToGetReviewResponse(domainPR models.PullRequest) api.PullR
 	return res
 }
 
-func MultiDomainPullRequestToGetReviewResponse(domainPRs []models.PullRequest) []api.PullRequestShort {
+func MultiDomainPullRequestToGetReviewResponse(domainPRs []domain.PullRequest) []api.PullRequestShort {
 	res := make([]api.PullRequestShort, 0, len(domainPRs))
 	for _, pr := range domainPRs {
 		res = append(res, DomainPullRequestToGetReviewResponse(pr))

@@ -4,16 +4,16 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/sariya23/manage_pr_service/internal/models"
+	"github.com/sariya23/manage_pr_service/internal/models/domain"
 )
 
 type UserRepository interface {
-	SetIsActive(ctx context.Context, id int64, isActive bool) (*models.User, error)
-	GetUserByID(ctx context.Context, userID int64) (*models.User, error)
+	SetIsActive(ctx context.Context, userID string, isActive bool) (*domain.User, error)
+	GetUserByID(ctx context.Context, userID string) (*domain.User, error)
 }
 
 type ReviewUserPullRequestRepository interface {
-	GetUserReviews(ctx context.Context, userID int64) ([]models.PullRequest, error)
+	GetUserReviews(ctx context.Context, userID string) ([]domain.PullRequest, error)
 }
 
 type UsersService struct {

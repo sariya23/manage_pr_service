@@ -1,8 +1,16 @@
 package apiteams
 
-import "log/slog"
+import (
+	"context"
+	"log/slog"
 
-type TeamService interface{}
+	"github.com/sariya23/manage_pr_service/internal/models/domain"
+	"github.com/sariya23/manage_pr_service/internal/models/dto"
+)
+
+type TeamService interface {
+	Add(ctx context.Context, teamName string, members []dto.TeamMember) ([]domain.User, error)
+}
 
 type TeamsImplementation struct {
 	logger       *slog.Logger

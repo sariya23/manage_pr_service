@@ -5,7 +5,6 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/render"
 	"github.com/sariya23/manage_pr_service/internal/converters"
@@ -39,16 +38,15 @@ func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request
 		render.JSON(w, r, erresponse.MakeInvalidResponse(msg))
 		return
 	}
-	userID, _ := strconv.Atoi(request.UserId)
-	domainUser, err := i.userService.SetIsActive(ctx, int64(userID), request.IsActive)
+	domainUser, err := i.userService.SetIsActive(ctx, request.UserId, request.IsActive)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {
-			log.Warn("user not found", slog.Int("user_id", userID))
+			log.Warn("user not found", slog.String("user_id", request.UserId))
 			w.WriteHeader(http.StatusNotFound)
-			render.JSON(w, r, erresponse.MakeInvalidResponse("user not found"))
+			render.JSON(w, r, erresponse.MakeNotFoundResponse("user not found"))
 			return
 		}
-		log.Error("unexpected error", slog.Int("user_id", userID), slog.String("error", err.Error()))
+		log.Error("unexpected error", slog.String("user_id", request.UserId), slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
 		return

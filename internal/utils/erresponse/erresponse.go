@@ -19,6 +19,13 @@ func MakeNotFoundResponse(msg string) api.ErrorResponse {
 	return errorResp
 }
 
+func MakeTeamAlreadyExistsResponse(msg string) api.ErrorResponse {
+	errorResp := api.ErrorResponse{}
+	errorResp.Error.Code = handlers.TEAM_ALREADY_EXISTS
+	errorResp.Error.Message = msg
+	return errorResp
+}
+
 func MakeInternalResponse(msg string) api.ErrorResponse {
 	errorResp := api.ErrorResponse{}
 	errorResp.Error.Code = handlers.INTERNAL
