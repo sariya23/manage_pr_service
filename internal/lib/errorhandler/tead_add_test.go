@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	api "github.com/sariya23/manage_pr_service/internal/generated"
+	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
-	"github.com/sariya23/manage_pr_service/internal/utils/erresponse"
 	"github.com/stretchr/testify/assert"
 )
 

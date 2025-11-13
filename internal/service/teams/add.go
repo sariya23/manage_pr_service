@@ -1,0 +1,73 @@
+package serviceteams
+
+import (
+	"context"
+	"fmt"
+	"log/slog"
+	"slices"
+
+	"github.com/sariya23/manage_pr_service/internal/models/domain"
+	"github.com/sariya23/manage_pr_service/internal/outerror"
+)
+
+func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest []domain.User) ([]domain.User, error) {
+	const operationPlace = "service.users.GetReview"
+	log := s.log.With("operationPlace", operationPlace)
+	teamExist, err := s.teamRepository.IsExists(ctx, teamName)
+	if err != nil {
+		log.Error("failed to check team existence",
+			slog.String("teamname", teamName),
+			slog.String("error", err.Error()))
+		return nil, fmt.Errorf("%s: %w", operationPlace, err)
+	}
+
+	if teamExist {
+		teamUserIDs, err := s.teamRepository.GetTeamUserIDs(ctx, teamName)
+		if err != nil {
+			log.Error("failed to get team user ids",
+				slog.String("teamname", teamName),
+				slog.String("error", err.Error()))
+			return nil, fmt.Errorf("%s: %w", operationPlace, err)
+		}
+		for _, memberReq := range membersRequest {
+			if slices.Contains(teamUserIDs, memberReq.UserID) {
+				log.Warn("team already exists", slog.String("teamname", teamName))
+				return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrTeamAlreadyExists)
+			}
+		}
+	}
+
+	for _, member := range membersRequest {
+		if member.IsActive == false {
+			log.Warn("member is not active", slog.String("user_id", member.UserID))
+			return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrInactiveUser)
+		}
+		userExists, err := s.userRepository.IsExists(ctx, member.UserID)
+		if err != nil {
+			log.Error("failed to check user existence",
+				slog.String("user_id", member.UserID),
+				slog.String("error", err.Error()))
+			return nil, fmt.Errorf("%s: %w", operationPlace, err)
+		}
+		if userExists {
+			userInTeam, err := s.teamRepository.InAnyTeam(ctx, member.UserID)
+			if err != nil {
+				log.Error("failed to check user membership in team",
+					slog.String("user_id", member.UserID),
+					slog.String("error", err.Error()))
+				return nil, fmt.Errorf("%s: %w", operationPlace, err)
+			}
+			if userInTeam {
+				log.Warn("user is already a member of some team", slog.String("user_id", member.UserID))
+				return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserAlreadyInTeam)
+			}
+		}
+	}
+
+	err = s.teamRepository.UpsertTeam(ctx, teamName, membersRequest)
+	if err != nil {
+		log.Error("failed to upsert team", slog.String("teamname", teamName), slog.String("error", err.Error()))
+		return nil, fmt.Errorf("%s: %w", operationPlace, err)
+	}
+	return membersRequest, nil
+}

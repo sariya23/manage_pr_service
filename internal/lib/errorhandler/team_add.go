@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	api "github.com/sariya23/manage_pr_service/internal/generated"
+	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
-	"github.com/sariya23/manage_pr_service/internal/utils/erresponse"
 )
 
 func TeamAdd(err error, teamName string) (status int, resp api.ErrorResponse, isError bool) {

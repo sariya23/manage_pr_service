@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/render"
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
-	"github.com/sariya23/manage_pr_service/internal/utils/erresponse"
-	"github.com/sariya23/manage_pr_service/internal/utils/errorhandler"
+	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
+	"github.com/sariya23/manage_pr_service/internal/lib/errorhandler"
 	teamsvalidators "github.com/sariya23/manage_pr_service/internal/validators/handlers/teams"
 )
 
