@@ -2,6 +2,7 @@ package serviceteams
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"slices"
@@ -22,7 +23,7 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 	}
 
 	if teamExist {
-		teamUserIDs, err := s.teamRepository.GetTeamUserIDs(ctx, teamName)
+		teamUserIDs, err := s.teamRepository.GetTeamMemberIDs(ctx, teamName)
 		if err != nil {
 			log.Error("failed to get team user ids",
 				slog.String("teamname", teamName),
@@ -42,22 +43,30 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 			log.Warn("member is not active", slog.String("user_id", member.UserID))
 			return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrInactiveUser)
 		}
-		userExists, err := s.userRepository.IsExists(ctx, member.UserID)
+		_, err := s.userRepository.GetUserByID(ctx, member.UserID)
+		isUserExists := true
 		if err != nil {
+			if errors.Is(err, outerror.ErrUserNotFound) {
+				isUserExists = false
+			}
 			log.Error("failed to check user existence",
 				slog.String("user_id", member.UserID),
 				slog.String("error", err.Error()))
 			return nil, fmt.Errorf("%s: %w", operationPlace, err)
 		}
-		if userExists {
-			userInTeam, err := s.teamRepository.InAnyTeam(ctx, member.UserID)
+		if isUserExists {
+			_, err := s.teamRepository.GetUserTeam(ctx, member.UserID)
+			isUserInTeam := true
 			if err != nil {
+				if errors.Is(err, outerror.ErrUserNotFound) {
+					isUserInTeam = false
+				}
 				log.Error("failed to check user membership in team",
 					slog.String("user_id", member.UserID),
 					slog.String("error", err.Error()))
 				return nil, fmt.Errorf("%s: %w", operationPlace, err)
 			}
-			if userInTeam {
+			if isUserInTeam {
 				log.Warn("user is already a member of some team", slog.String("user_id", member.UserID))
 				return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserAlreadyInTeam)
 			}

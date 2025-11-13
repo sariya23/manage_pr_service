@@ -8,15 +8,14 @@ import (
 )
 
 type TeamRepository interface {
-	InAnyTeam(ctx context.Context, userID string) (bool, error)
+	GetUserTeam(ctx context.Context, userID string) (string, error)
 	IsExists(context.Context, string) (bool, error)
-	GetTeamUserIDs(ctx context.Context, teamName string) ([]string, error)
+	GetTeamMemberIDs(ctx context.Context, teamName string) ([]string, error)
 	UpsertTeam(ctx context.Context, teamName string, users []domain.User) error
 }
 
 type UserRepository interface {
-	IsExists(ctx context.Context, userID string) (bool, error)
-	CreateUser(ctx context.Context, user domain.User) (domain.User, error)
+	GetUserByID(ctx context.Context, userID string) (*domain.User, error)
 }
 
 type TeamsService struct {

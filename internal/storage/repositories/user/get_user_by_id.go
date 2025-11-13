@@ -10,7 +10,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
 
-func (u *UserRepository) GetUserByID(ctx context.Context, userID int64) (*domain.User, error) {
+func (u *UserRepository) GetUserByID(ctx context.Context, userID string) (*domain.User, error) {
 	const operationPlace = "storage.repositories.user.GetUserByID"
 
 	getUserSQL := fmt.Sprintf("select %s, %s, %s from '%s' where %s=$1",
