@@ -12,7 +12,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
 
-func (s *PullRequestService) CreatePullRequestAndAssignReviewers(ctx context.Context, prData dto.CreatePullRequestDTO) (*domain.PullRequest, []domain.User, error) {
+func (s *PullRequestService) CreatePullRequestAndAssignReviewers(ctx context.Context, prData dto.CreatePullRequestDTO) (*domain.PullRequest, error) {
 	const operationPlace = "service.pull_request.create_pull_request_and_assign_reviewers"
 	log := s.log.With("operation_place", operationPlace)
 
@@ -20,37 +20,37 @@ func (s *PullRequestService) CreatePullRequestAndAssignReviewers(ctx context.Con
 	if err != nil {
 		if !errors.Is(err, outerror.ErrPullRequestNotFound) {
 			log.Error("unexpected error", slog.String("pr id", prData.ID), slog.String("error", err.Error()))
-			return nil, nil, fmt.Errorf("%s:%w", operationPlace, err)
+			return nil, fmt.Errorf("%s:%w", operationPlace, err)
 		}
 	} else {
 		log.Warn("pull request already exists", slog.String("pr id", prData.ID))
-		return nil, nil, fmt.Errorf("%s:%w", operationPlace, outerror.ErrPullRequestAlreadyExists)
+		return nil, fmt.Errorf("%s:%w", operationPlace, outerror.ErrPullRequestAlreadyExists)
 	}
 
 	_, err = s.UserRepo.GetUserByID(ctx, prData.AuthorID)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {
 			log.Warn("author does not exist", slog.String("user_id", prData.AuthorID))
-			return nil, nil, fmt.Errorf("%s:%w", operationPlace, outerror.ErrUserNotFound)
+			return nil, fmt.Errorf("%s:%w", operationPlace, outerror.ErrUserNotFound)
 		}
 		log.Error("unexpected error while getting user", slog.String("user_id", prData.AuthorID), slog.String("error", err.Error()))
-		return nil, nil, fmt.Errorf("%s:%w", operationPlace, err)
+		return nil, fmt.Errorf("%s:%w", operationPlace, err)
 	}
 
 	teamName, err := s.TeamRepo.GetUserTeam(ctx, prData.AuthorID)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotInAnyTeam) {
 			log.Warn("user not in any team", slog.String("user_id", prData.AuthorID))
-			return nil, nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserNotInAnyTeam)
+			return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserNotInAnyTeam)
 		}
 		log.Error("unexpected error while getting user team", slog.String("user_id", prData.AuthorID), slog.String("error", err.Error()))
-		return nil, nil, fmt.Errorf("%s:%w", operationPlace, err)
+		return nil, fmt.Errorf("%s:%w", operationPlace, err)
 	}
 
 	teamMembers, err := s.TeamRepo.GetTeamMembers(ctx, teamName)
 	if err != nil {
 		log.Error("unexpected error while getting team members", slog.String("team_name", teamName), slog.String("error", err.Error()))
-		return nil, nil, fmt.Errorf("%s:%w", operationPlace, err)
+		return nil, fmt.Errorf("%s:%w", operationPlace, err)
 	}
 
 	reviewers := pickReviewersForPR(onlyActiveUsers(teamMembers), prData.AuthorID)
@@ -58,9 +58,9 @@ func (s *PullRequestService) CreatePullRequestAndAssignReviewers(ctx context.Con
 	pullRequest, err := s.PullRequestRepo.CreatePullRequestAndAssignReviewers(ctx, prData, domain.UserIDs(reviewers))
 	if err != nil {
 		log.Error("cannot crate PR and assign reviewers", slog.String("pr_id", prData.ID), slog.String("error", err.Error()))
-		return nil, nil, fmt.Errorf("%s: %w", operationPlace, err)
+		return nil, fmt.Errorf("%s: %w", operationPlace, err)
 	}
-	return pullRequest, reviewers, nil
+	return pullRequest, nil
 }
 
 // onlyActiveUsers оставляет только активных юзеров

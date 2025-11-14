@@ -9,9 +9,8 @@ import (
 )
 
 type PullRequestService interface {
-	CreatePullRequestAndAssignReviewers(ctx context.Context, prData dto.CreatePullRequestDTO) (*domain.PullRequest, []domain.User, error)
+	CreatePullRequestAndAssignReviewers(ctx context.Context, prData dto.CreatePullRequestDTO) (*domain.PullRequest, error)
 	Merge(ctx context.Context, pdID string) (*domain.PullRequest, error)
-	GetPullRequestReviewers(ctx context.Context, prID string) ([]domain.User, error)
 }
 
 type PullRequestImplementation struct {

@@ -10,10 +10,11 @@ const (
 )
 
 type PullRequest struct {
-	ID        string
-	Name      string
-	AuthorID  string
-	Status    PullRequestStatus
-	MergedAt  *time.Time
-	CreatedAt time.Time
+	ID                  string
+	Name                string
+	AuthorID            string
+	Status              PullRequestStatus
+	MergedAt            *time.Time
+	CreatedAt           time.Time
+	AssignedReviewerIDs []string
 }

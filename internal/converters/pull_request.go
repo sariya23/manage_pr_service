@@ -31,16 +31,18 @@ func DomainPullRequestToCreatePullRequestResponse(domainPR domain.PullRequest) a
 	pr.Status = api.PullRequestStatus(domainPR.Status)
 	pr.MergedAt = domainPR.MergedAt
 	pr.CreatedAt = &domainPR.CreatedAt
+	pr.AssignedReviewers = domainPR.AssignedReviewerIDs
 	return pr
 }
 
 func PullRequestDBToDomain(dbPR dto.PullRequestDB) domain.PullRequest {
 
 	res := domain.PullRequest{
-		ID:       dbPR.ID,
-		AuthorID: dbPR.AuthorID,
-		Name:     dbPR.Name,
-		Status:   domain.PullRequestStatus(dbPR.Status),
+		ID:                  dbPR.ID,
+		AuthorID:            dbPR.AuthorID,
+		Name:                dbPR.Name,
+		Status:              domain.PullRequestStatus(dbPR.Status),
+		AssignedReviewerIDs: dbPR.AssignedReviewerIDs,
 	}
 
 	if dbPR.MergedAt.Valid {

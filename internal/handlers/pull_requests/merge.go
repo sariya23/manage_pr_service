@@ -10,7 +10,6 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
-	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
 
@@ -50,20 +49,7 @@ func (i *PullRequestImplementation) Merge(w http.ResponseWriter, r *http.Request
 		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
 		return
 	}
-	reviewers, err := i.prService.GetPullRequestReviewers(ctx, pr.ID)
-	if err != nil {
-		if errors.Is(err, outerror.ErrPullRequestNotFound) {
-			log.Error("error getting pull request reviewers", slog.String("msg", "PR must exist"))
-			w.WriteHeader(http.StatusNotFound)
-			render.JSON(w, r, erresponse.MakeNotFoundResponse("resource not found"))
-			return
-		}
-		w.WriteHeader(http.StatusInternalServerError)
-		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
-		return
-	}
 	prRes := converters.DomainPullRequestToCreatePullRequestResponse(*pr)
-	prRes.AssignedReviewers = domain.UserIDs(reviewers)
 	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, api.PostPullRequestMerge200JSONResponse{
 		Pr: &prRes,

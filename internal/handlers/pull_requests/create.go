@@ -10,7 +10,6 @@ import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/lib/errorhandler"
-	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/models/dto"
 	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators/handlers/pull_request"
 )
@@ -40,14 +39,13 @@ func (i *PullRequestImplementation) Create(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	pullRequest, reviewers, err := i.prService.CreatePullRequestAndAssignReviewers(ctx, dto.FromCreatePullRequestHTTP(request))
+	pullRequest, err := i.prService.CreatePullRequestAndAssignReviewers(ctx, dto.FromCreatePullRequestHTTP(request))
 	if status, resp, isError := errorhandler.PullRequestCreate(err); isError {
 		w.WriteHeader(status)
 		render.JSON(w, r, resp)
 		return
 	}
 	prRes := converters.DomainPullRequestToCreatePullRequestResponse(*pullRequest)
-	prRes.AssignedReviewers = domain.UserIDs(reviewers)
 	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, api.PostPullRequestMerge200JSONResponse{
 		Pr: &prRes,
