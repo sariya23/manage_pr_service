@@ -54,7 +54,7 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 			_, err := s.teamRepository.GetUserTeam(ctx, member.UserID)
 			isUserInTeam := true
 			if err != nil {
-				if errors.Is(err, outerror.ErrUserNotFound) {
+				if errors.Is(err, outerror.ErrUserNotInAnyTeam) {
 					isUserInTeam = false
 				} else {
 					log.Error("failed to check user membership in team",

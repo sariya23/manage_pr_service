@@ -54,7 +54,7 @@ func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request
 
 	teamName, err := i.userService.GetUserTeam(ctx, domainUser.UserID)
 	if err != nil {
-		if !errors.Is(err, outerror.ErrUserNotFound) {
+		if !errors.Is(err, outerror.ErrUserNotInAnyTeam) {
 			log.Error("unexpected error", slog.String("user_id", domainUser.UserID))
 			w.WriteHeader(http.StatusInternalServerError)
 			render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))

@@ -10,10 +10,6 @@ func ValidateTeamAddRequest(request api.PostTeamAddJSONRequestBody) (string, boo
 		return "teamname is required", false
 	}
 
-	if len(request.Members) == 0 {
-		return "must have at least one member", false
-	}
-
 	for _, member := range request.Members {
 		if member.Username == "" {
 			return "username is required", false

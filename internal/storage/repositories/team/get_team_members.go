@@ -2,6 +2,8 @@ package repo_team
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
@@ -25,6 +27,9 @@ func (r *TeamRepository) GetTeamMembers(ctx context.Context, teamName string) ([
 
 	rows, err := r.conn.GetPool().Query(ctx, getTeamMembersSQL, teamName)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return users, nil
+		}
 		return nil, fmt.Errorf("%s: %w", operationPlace, err)
 	}
 	defer rows.Close()

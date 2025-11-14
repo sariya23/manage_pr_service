@@ -54,6 +54,7 @@ func main() {
 		})
 		r.Route("/team", func(r chi.Router) {
 			r.Post("/add", teamsImpl.Add)
+			r.Get("/get/{team_name}", teamsImpl.Get)
 		})
 	})
 

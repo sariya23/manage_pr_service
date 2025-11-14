@@ -56,14 +56,18 @@ func (r *TeamRepository) InsertTeam(ctx context.Context, teamName string, users 
 		return fmt.Errorf("%s:insertTeamSQL: %w", operationPlace, err)
 	}
 
-	_, err = tx.Exec(ctx, insertUsersSQL.String(), insertUsersArgs...)
-	if err != nil {
-		return fmt.Errorf("%s:insertUsersSQL: %w", operationPlace, err)
+	if len(users) > 0 {
+		_, err = tx.Exec(ctx, insertUsersSQL.String(), insertUsersArgs...)
+		if err != nil {
+			return fmt.Errorf("%s:insertUsersSQL: %w", operationPlace, err)
+		}
 	}
 
-	_, err = tx.Exec(ctx, insertTeamMemberSQL.String(), insertTeamMemberArgs...)
-	if err != nil {
-		return fmt.Errorf("%s:insertTeamMemberSQL: %w", operationPlace, err)
+	if len(users) > 0 {
+		_, err = tx.Exec(ctx, insertTeamMemberSQL.String(), insertTeamMemberArgs...)
+		if err != nil {
+			return fmt.Errorf("%s:insertTeamMemberSQL: %w", operationPlace, err)
+		}
 	}
 
 	err = tx.Commit(ctx)

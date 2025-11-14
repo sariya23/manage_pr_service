@@ -56,12 +56,6 @@ func TestValidateTeamAddRequest(t *testing.T) {
 			expectedValid: false,
 			expectedMsg:   "user_id is required",
 		},
-		{
-			name:          "no members",
-			request:       api.PostTeamAddJSONRequestBody{TeamName: "asd", Members: nil},
-			expectedValid: false,
-			expectedMsg:   "must have at least one member",
-		},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

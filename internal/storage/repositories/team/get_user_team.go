@@ -26,10 +26,9 @@ func (r *TeamRepository) GetUserTeam(ctx context.Context, userID string) (string
 	err := row.Scan(&teamName)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return "", fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserNotFound)
-		} else {
-			return "", fmt.Errorf("%s: %w", operationPlace, err)
+			return "", fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserNotInAnyTeam)
 		}
+		return "", fmt.Errorf("%s: %w", operationPlace, err)
 	}
 
 	return teamName, nil

@@ -9,4 +9,5 @@ var (
 	ErrUserAlreadyInTeam = errors.New("user already in team")
 	ErrInactiveUser      = errors.New("inactive user")
 	ErrTeamNotFound      = errors.New("team not found")
+	ErrUserNotInAnyTeam  = errors.New("user not in any team")
 )

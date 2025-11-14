@@ -15,9 +15,9 @@ func (s *UsersService) GetUserTeam(ctx context.Context, userID string) (string, 
 
 	teamName, err := s.teamRepo.GetUserTeam(ctx, userID)
 	if err != nil {
-		if errors.Is(err, outerror.ErrTeamNotFound) {
+		if errors.Is(err, outerror.ErrUserNotInAnyTeam) {
 			log.Warn("user not found", slog.String("user_id", userID))
-			return "", fmt.Errorf("%s: %w", operationPlace, outerror.ErrTeamNotFound)
+			return "", fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserNotFound)
 		}
 		log.Error("failed to get user team",
 			slog.String("user_id", userID),
