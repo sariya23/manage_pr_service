@@ -53,3 +53,11 @@ func PullRequestDBToDomain(dbPR dto.PullRequestDB) domain.PullRequest {
 	}
 	return res
 }
+
+func MultiPullRequestDBToDomain(dbPR []dto.PullRequestDB) []domain.PullRequest {
+	res := make([]domain.PullRequest, 0, len(dbPR))
+	for _, dbPR := range dbPR {
+		res = append(res, PullRequestDBToDomain(dbPR))
+	}
+	return res
+}
