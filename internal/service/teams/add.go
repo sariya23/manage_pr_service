@@ -75,5 +75,10 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 		log.Error("failed to upsert team", slog.String("teamname", teamName), slog.String("error", err.Error()))
 		return nil, fmt.Errorf("%s: %w", operationPlace, err)
 	}
-	return membersRequest, nil
+	membersUpdated, err := s.teamRepository.GetTeamMembers(ctx, teamName)
+	if err != nil {
+		log.Error("failed to get team members", slog.String("teamname", teamName), slog.String("error", err.Error()))
+		return nil, fmt.Errorf("%s: %w", operationPlace, err)
+	}
+	return membersUpdated, nil
 }

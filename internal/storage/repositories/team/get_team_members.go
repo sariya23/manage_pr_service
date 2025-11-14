@@ -9,17 +9,18 @@ import (
 )
 
 func (r *TeamRepository) GetTeamMembers(ctx context.Context, teamName string) ([]domain.User, error) {
-	const operationPlace = "storage.repositories.team.GetTeamMemberIDs"
+	const operationPlace = "storage.repositories.team.GetTeamMember"
 
-	getTeamMembersSQL := fmt.Sprintf("select %s, %s, %s from %s join %s using(%s) where %s=$1",
+	getTeamMembersSQL := fmt.Sprintf("select %s, %s, %s from %s join %s using(%s) join \"%s\" using(%s) where %s=$1",
 		TeamMemberTableUserIDField,
 		repo_user.UserTableUsernameField,
 		repo_user.UserTableIsActiveField,
 		TeamTableName,
 		TeamMemberTableName,
 		TeamTableTeamNameField,
+		repo_user.UserTableName,
+		repo_user.UserTableUserIDField,
 		TeamTableTeamNameField)
-
 	var users []domain.User
 
 	rows, err := r.conn.GetPool().Query(ctx, getTeamMembersSQL, teamName)
