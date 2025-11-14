@@ -16,7 +16,7 @@ func (r *PullRequestRepository) GetPullRequest(ctx context.Context, prID string)
 	const operationPlace = "storage.repositories.pull_request.get_pull_request"
 
 	getPullRequestSQL := `select pull_request_id, pull_request_name, 
-author_id, status, merged_at, created_at from pull_request where pull_request_id=$1`
+author_id, status, merged_at, created_at, assigned_reviewers from pull_request where pull_request_id=$1`
 
 	var pullRequestDB dto.PullRequestDB
 
@@ -27,7 +27,8 @@ author_id, status, merged_at, created_at from pull_request where pull_request_id
 		&pullRequestDB.AuthorID,
 		&pullRequestDB.Status,
 		&pullRequestDB.MergedAt,
-		&pullRequestDB.CreatedAt)
+		&pullRequestDB.CreatedAt,
+		&pullRequestDB.AssignedReviewerIDs)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%s:%w", operationPlace, outerror.ErrPullRequestNotFound)

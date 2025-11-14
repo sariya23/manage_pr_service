@@ -12,7 +12,7 @@ import (
 func (r *PullRequestRepository) MergePullRequest(ctx context.Context, prID string) (*domain.PullRequest, error) {
 	const operationPlace = "storage.repositories.pull_request.MergePullRequest"
 
-	updatePullRequestSQL := `update pull_request set status='MERGED' where pull_request_id = $1
+	updatePullRequestSQL := `update pull_request set status='MERGED', merged_at=current_timestamp where pull_request_id = $1
 	returning pull_request_id, pull_request_name, author_id, status, merged_at, created_at, assigned_reviewers`
 
 	row := r.conn.GetPool().QueryRow(ctx, updatePullRequestSQL, prID)
@@ -29,7 +29,7 @@ func (r *PullRequestRepository) MergePullRequest(ctx context.Context, prID strin
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", operationPlace, err)
 	}
-
+	fmt.Println(pullRequest)
 	res := converters.PullRequestDBToDomain(pullRequest)
 	return &res, nil
 }

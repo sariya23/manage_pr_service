@@ -62,6 +62,7 @@ func main() {
 		})
 		r.Route("/pullRequest", func(r chi.Router) {
 			r.Post("/create", pullRequestImpl.Create)
+			r.Post("/merge", pullRequestImpl.Merge)
 		})
 	})
 
