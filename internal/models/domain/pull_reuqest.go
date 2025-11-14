@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type PullRequestStatus string
 
 const (
@@ -8,8 +10,10 @@ const (
 )
 
 type PullRequest struct {
-	PullRequestID int64
-	Name          string
-	AuthorID      int64
-	Status        PullRequestStatus
+	ID        string
+	Name      string
+	AuthorID  string
+	Status    PullRequestStatus
+	MergedAt  time.Time
+	CreatedAt time.Time
 }

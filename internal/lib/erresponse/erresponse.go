@@ -32,3 +32,10 @@ func MakeInternalResponse(msg string) api.ErrorResponse {
 	errorResp.Error.Message = msg
 	return errorResp
 }
+
+func MakePullRequestAlreadyExistsResponse(msg string) api.ErrorResponse {
+	errorResp := api.ErrorResponse{}
+	errorResp.Error.Code = handlers.PULL_REQUEST_ALREADY_EXISTS
+	errorResp.Error.Message = msg
+	return errorResp
+}
