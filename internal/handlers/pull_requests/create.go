@@ -41,7 +41,7 @@ func (i *PullRequestImplementation) Create(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	pullRequest, err := i.prService.CreatePullRequest(ctx, dto.FromCreatePullRequestHTTP(request))
+	pullRequest, reviewers, err := i.prService.CreatePullRequest(ctx, dto.FromCreatePullRequestHTTP(request))
 	if err != nil {
 		if errors.Is(err, outerror.ErrPullRequestAlreadyExists) {
 			w.WriteHeader(http.StatusConflict)
@@ -51,16 +51,6 @@ func (i *PullRequestImplementation) Create(w http.ResponseWriter, r *http.Reques
 			w.WriteHeader(http.StatusConflict)
 			render.JSON(w, r, erresponse.MakeNotFoundResponse("author_id not found"))
 			return
-		}
-		w.WriteHeader(http.StatusInternalServerError)
-		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
-		return
-	}
-
-	reviewers, err := i.prService.AssignReviewers(ctx, pullRequest.ID)
-	if err != nil {
-		if errors.Is(err, outerror.ErrPullRequestNotFound) {
-			log.Error("pr must be created on prev step", slog.String("pr_id", pullRequest.ID))
 		}
 		w.WriteHeader(http.StatusInternalServerError)
 		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))

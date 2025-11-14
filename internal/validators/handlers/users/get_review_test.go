@@ -29,7 +29,7 @@ func TestValidateGetUserReviewRequest(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			msg, valid := ValidateGetUserReviewRequest(c.request)
+			msg, valid := ValidateGetUserReviewRequest(c.request.Params.UserId)
 			assert.Equal(t, c.expectedValid, valid)
 			assert.Equal(t, c.expectedMsg, msg)
 		})

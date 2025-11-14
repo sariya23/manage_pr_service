@@ -10,6 +10,8 @@ const (
 	PullRequestRTablePullRequestNameField = "pull_request_name"
 	PullRequestTableAuthorIDField         = "author_id"
 	PullRequestTableStatusField           = "status"
+	PullRequestTableMergedField           = "merged_at"
+	PullRequestTableCreatedField          = "created_at"
 
 	UserPullRequestTableName               = "user_pull_request"
 	UserPullRequestTableUserID             = "user_id"

@@ -10,11 +10,13 @@ import (
 func (r *PullRequestRepository) GetUserReviews(ctx context.Context, userID string) ([]domain.PullRequest, error) {
 	const operationPlace = "storage.repositories.pull_request.GetUserReviews"
 
-	getPullRequestsSQL := fmt.Sprintf("select %s, %s, %s, %s from %s join %s using(%s) where %s=$1",
+	getPullRequestsSQL := fmt.Sprintf("select %s, %s, %s, %s, %s, %s from %s join %s using(%s) where %s=$1",
 		PullRequestTablePullRequestIDField,
 		PullRequestRTablePullRequestNameField,
 		PullRequestTableAuthorIDField,
 		PullRequestTableStatusField,
+		PullRequestTableMergedField,
+		PullRequestTableCreatedField,
 		PullRequestTableName,
 		UserPullRequestTableName,
 		PullRequestTablePullRequestIDField,
@@ -28,10 +30,12 @@ func (r *PullRequestRepository) GetUserReviews(ctx context.Context, userID strin
 	for prRows.Next() {
 		var pullRequest domain.PullRequest
 		err = prRows.Scan(
-			&pullRequest.PullRequestID,
+			&pullRequest.ID,
 			&pullRequest.Name,
 			&pullRequest.AuthorID,
-			&pullRequest.Status)
+			&pullRequest.Status,
+			&pullRequest.MergedAt,
+			&pullRequest.CreatedAt)
 		if err != nil {
 			return nil, fmt.Errorf("%s: %w", operationPlace, err)
 		}

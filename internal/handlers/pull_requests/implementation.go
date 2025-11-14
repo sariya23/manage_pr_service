@@ -9,7 +9,7 @@ import (
 )
 
 type PullRequestService interface {
-	CreatePullRequest(ctx context.Context, prData dto.CreatePullRequestDTO) (domain.PullRequest, error)
+	CreatePullRequest(ctx context.Context, prData dto.CreatePullRequestDTO) (domain.PullRequest, []domain.User, error)
 	AssignReviewers(ctx context.Context, prID string) ([]domain.User, error)
 }
 
