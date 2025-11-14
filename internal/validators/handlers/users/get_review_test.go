@@ -8,6 +8,7 @@ import (
 )
 
 func TestValidateGetUserReviewRequest(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name          string
 		request       api.GetUsersGetReviewRequestObject
@@ -29,6 +30,7 @@ func TestValidateGetUserReviewRequest(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
+			t.Parallel()
 			msg, valid := ValidateGetUserReviewRequest(c.request.Params.UserId)
 			assert.Equal(t, c.expectedValid, valid)
 			assert.Equal(t, c.expectedMsg, msg)

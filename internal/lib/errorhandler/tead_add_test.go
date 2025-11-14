@@ -13,6 +13,7 @@ import (
 )
 
 func TestTeamAdd(t *testing.T) {
+	t.Parallel()
 	someErr := errors.New("some error")
 	cases := []struct {
 		name            string
@@ -65,6 +66,7 @@ func TestTeamAdd(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			st, resp, isError := TeamAdd(tc.err, tc.teamName)
 			assert.Equal(t, tc.expectedStatus, st)
 			assert.Equal(t, tc.expectedResp, resp)

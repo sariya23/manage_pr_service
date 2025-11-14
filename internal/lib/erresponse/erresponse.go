@@ -39,3 +39,24 @@ func MakePullRequestAlreadyExistsResponse(msg string) api.ErrorResponse {
 	errorResp.Error.Message = msg
 	return errorResp
 }
+
+func MakePullRequestMergedResponse(msg string) api.ErrorResponse {
+	errorResp := api.ErrorResponse{}
+	errorResp.Error.Code = handlers.PULL_REQUEST_MERGED
+	errorResp.Error.Message = msg
+	return errorResp
+}
+
+func MakePullRequestUserNotReviewerResponse(msg string) api.ErrorResponse {
+	errorResp := api.ErrorResponse{}
+	errorResp.Error.Code = handlers.USER_NOT_REVIEWER
+	errorResp.Error.Message = msg
+	return errorResp
+}
+
+func MakePullRequestNoCandidateResponse(msg string) api.ErrorResponse {
+	errorResp := api.ErrorResponse{}
+	errorResp.Error.Code = handlers.NO_CANDIDATE
+	errorResp.Error.Message = msg
+	return errorResp
+}

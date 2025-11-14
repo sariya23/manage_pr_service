@@ -8,6 +8,7 @@ import (
 )
 
 func TestValidateTeamAddRequest(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name          string
 		request       api.PostTeamAddJSONRequestBody
@@ -59,6 +60,7 @@ func TestValidateTeamAddRequest(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			msg, valid := ValidateTeamAddRequest(tc.request)
 			assert.Equal(t, tc.expectedValid, valid)
 			assert.Equal(t, tc.expectedMsg, msg)

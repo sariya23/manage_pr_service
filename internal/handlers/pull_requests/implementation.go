@@ -11,6 +11,7 @@ import (
 type PullRequestService interface {
 	CreatePullRequestAndAssignReviewers(ctx context.Context, prData dto.CreatePullRequestDTO) (*domain.PullRequest, error)
 	Merge(ctx context.Context, pdID string) (*domain.PullRequest, error)
+	Reassign(ctx context.Context, prID string, oldReviewerID string) (*domain.PullRequest, string, error)
 }
 
 type PullRequestImplementation struct {

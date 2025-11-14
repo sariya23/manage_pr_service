@@ -12,6 +12,7 @@ import (
 )
 
 func TestPullRequestCreate(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name        string
 		err         error
@@ -57,6 +58,7 @@ func TestPullRequestCreate(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
+			t.Parallel()
 			st, resp, ok := PullRequestCreate(c.err)
 			assert.Equal(t, c.wantStatus, st)
 			assert.Equal(t, c.wantResp, resp)
