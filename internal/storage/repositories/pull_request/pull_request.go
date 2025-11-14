@@ -4,20 +4,6 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/storage/database"
 )
 
-const (
-	PullRequestTableName                  = "pull_request"
-	PullRequestTablePullRequestIDField    = "pull_request_id"
-	PullRequestRTablePullRequestNameField = "pull_request_name"
-	PullRequestTableAuthorIDField         = "author_id"
-	PullRequestTableStatusField           = "status"
-	PullRequestTableMergedField           = "merged_at"
-	PullRequestTableCreatedField          = "created_at"
-
-	UserPullRequestTableName               = "user_pull_request"
-	UserPullRequestTableUserID             = "user_id"
-	UserPullRequestTablePullRequestIDField = "pull_request_id"
-)
-
 type PullRequestRepository struct {
 	conn *database.Database
 }

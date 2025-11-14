@@ -14,7 +14,7 @@ func (r *PullRequestRepository) CreatePullRequestAndAssignReviewers(ctx context.
 
 	insertPullRequestSQL := `insert into pull_request 
     (pull_request_id, pull_request_name, author_id, assigned_reviewers) values ($1, $2, $3, $4) 
-    returning pull_request_id, pull_request_name, author_id, status, created_at, assigned_reviewers`
+    returning pull_request_id, pull_request_name, author_id, status, created_at, merged_at, assigned_reviewers`
 
 	var pullRequestDb dto.PullRequestDB
 
@@ -25,6 +25,7 @@ func (r *PullRequestRepository) CreatePullRequestAndAssignReviewers(ctx context.
 		&pullRequestDb.AuthorID,
 		&pullRequestDb.Status,
 		&pullRequestDb.CreatedAt,
+		&pullRequestDb.MergedAt,
 		&pullRequestDb.AssignedReviewerIDs,
 	)
 	if err != nil {
