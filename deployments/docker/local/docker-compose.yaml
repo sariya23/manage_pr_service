@@ -1,0 +1,45 @@
+
+services:
+  pg_manage_db:
+    image: postgres:16
+    restart: "always"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME} -d ${POSTGRES_DB} -p ${POSTGRES_PORT}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pg_manage_migrations:
+    build:
+      dockerfile: deployments/docker/local/Dockerfile
+      context: ../../..
+      target: dev
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    depends_on:
+      pg_manage_db:
+        condition: service_healthy
+    command: sh -c "until pg_isready -h ${POSTGRES_HOST_INNER_HOST} -p ${POSTGRES_PORT}; do sleep 1; done; make service_migrate_inner ENV=local"
+
+
+  pg_manage_app:
+    build:
+      dockerfile: deployments/docker/local/Dockerfile
+      context: ../../..
+      target: dev
+    restart: "always"
+    ports:
+      - "${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT}"
+    depends_on:
+      pg_manage_db:
+        condition: service_healthy
+    command: ./service --config=${CONFIG_PATH}
