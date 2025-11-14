@@ -38,7 +38,7 @@ func (i *PullRequestImplementation) Reassign(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	pr, newReviewer, err := i.prService.Reassign(ctx, request.OldUserId, request.PullRequestId)
+	pr, newReviewer, err := i.prService.Reassign(ctx, request.PullRequestId, request.OldUserId)
 	if status, resp, isError := errorhandler.PullRequestReassign(err); isError {
 		w.WriteHeader(status)
 		render.JSON(w, r, resp)

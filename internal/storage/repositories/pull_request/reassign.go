@@ -13,10 +13,10 @@ func (r *PullRequestRepository) ReassignPullRequest(ctx context.Context, prID st
 	const operationPlace = "storage.repositories.pull_request.Reassign"
 
 	updatePullRequestReviewersSQL := `update pull_request set 
-    assigned_reviewers=array_replace(assigned_reviewers, $1, $2)
+    assigned_reviewers=array_replace(assigned_reviewers, $1, $2) where pull_request_id = $3
     returning pull_request_id, pull_request_name, author_id, status, merged_at, created_at, assigned_reviewers`
 
-	row := r.conn.GetPool().QueryRow(ctx, updatePullRequestReviewersSQL, oldReviewerID, newReviewerID)
+	row := r.conn.GetPool().QueryRow(ctx, updatePullRequestReviewersSQL, oldReviewerID, newReviewerID, prID)
 	var pullRequest dto.PullRequestDB
 	err := row.Scan(
 		&pullRequest.ID,

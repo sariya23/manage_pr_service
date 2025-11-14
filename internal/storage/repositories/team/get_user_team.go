@@ -12,7 +12,7 @@ import (
 func (r *TeamRepository) GetUserTeam(ctx context.Context, userID string) (string, error) {
 	const operationPlace = "storage.repositories.team.GetUserTeam"
 
-	getUserTeamSQL := `select team_name from team join team_member using(team_name where user_id=$1)`
+	getUserTeamSQL := `select team_name from team join team_member using(team_name) where user_id=$1`
 	var teamName string
 	fmt.Println(getUserTeamSQL)
 	row := r.conn.GetPool().QueryRow(ctx, getUserTeamSQL, userID)

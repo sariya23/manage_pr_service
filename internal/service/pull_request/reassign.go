@@ -19,11 +19,18 @@ func (s *PullRequestService) Reassign(ctx context.Context, prID string, oldRevie
 	pr, err := s.PullRequestRepo.GetPullRequest(ctx, prID)
 	if err != nil {
 		if errors.Is(err, outerror.ErrPullRequestNotFound) {
+			log.Warn("pull request not found", slog.String("pr id", prID))
 			return nil, "", fmt.Errorf("%s:%w", operationPlace, err)
 		}
 		log.Error("failed to get pull request", slog.String("pr id", prID), slog.String("error", err.Error()))
 		return nil, "", fmt.Errorf("%s:%w", operationPlace, err)
 	}
+
+	if pr.MergedAt != nil {
+		log.Warn("PR already merged", slog.String("pr id", prID))
+		return nil, "", fmt.Errorf("%s:%w", operationPlace, outerror.ErrPullRequestMerged)
+	}
+
 	_, err = s.UserRepo.GetUserByID(ctx, oldReviewerID)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {
@@ -58,9 +65,9 @@ func (s *PullRequestService) Reassign(ctx context.Context, prID string, oldRevie
 			slog.String("team name", teamName))
 		return nil, "", fmt.Errorf("%s:%w", operationPlace, outerror.ErrUserNotInPullRequestTeam)
 	}
-
-	members = excludePRAuthorFromTeamMembers(onlyActiveUsers(members), pr.AuthorID)
-
+	excludedIDs := []string{pr.AuthorID, oldReviewerID}
+	excludedIDs = append(excludedIDs, pr.AssignedReviewerIDs...)
+	members = excludeUserIDsFromTeamMembers(onlyActiveUsers(members), excludedIDs)
 	if len(members) == 0 {
 		log.Warn("no reviewer candidates", slog.String("pr_id", prID),
 			slog.String("author_id", pr.AuthorID), slog.String("tema name", teamName))
@@ -76,10 +83,10 @@ func (s *PullRequestService) Reassign(ctx context.Context, prID string, oldRevie
 	return updatedPR, newReviewerID.UserID, nil
 }
 
-func excludePRAuthorFromTeamMembers(members []domain.User, authorID string) []domain.User {
+func excludeUserIDsFromTeamMembers(members []domain.User, userIDs []string) []domain.User {
 	res := make([]domain.User, 0, len(members)-1)
 	for _, m := range members {
-		if m.UserID != authorID {
+		if !slices.Contains(userIDs, m.UserID) {
 			res = append(res, m)
 		}
 	}
