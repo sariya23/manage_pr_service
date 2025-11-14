@@ -9,15 +9,15 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/models/dto"
 )
 
-func (r *PullRequestRepository) MergePullRequest(ctx context.Context, prID string) (*domain.PullRequest, error) {
-	const operationPlace = "storage.repositories.pull_request.MergePullRequest"
+func (r *PullRequestRepository) ReassignPullRequest(ctx context.Context, prID string, oldReviewerID, newReviewerID string) (*domain.PullRequest, error) {
+	const operationPlace = "storage.repositories.pull_request.Reassign"
 
-	updatePullRequestSQL := `update pull_request set status='MERGED', merged_at=current_timestamp where pull_request_id = $1
-	returning pull_request_id, pull_request_name, author_id, status, merged_at, created_at, assigned_reviewers`
+	updatePullRequestReviewersSQL := `update pull_request set 
+    assigned_reviewers=array_replace(assigned_reviewers, $1, $2)
+    returning pull_request_id, pull_request_name, author_id, status, merged_at, created_at, assigned_reviewers`
 
-	row := r.conn.GetPool().QueryRow(ctx, updatePullRequestSQL, prID)
+	row := r.conn.GetPool().QueryRow(ctx, updatePullRequestReviewersSQL, oldReviewerID, newReviewerID)
 	var pullRequest dto.PullRequestDB
-
 	err := row.Scan(
 		&pullRequest.ID,
 		&pullRequest.Name,
