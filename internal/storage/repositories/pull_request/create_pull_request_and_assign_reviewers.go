@@ -30,9 +30,18 @@ func (r *PullRequestRepository) CreatePullRequestAndAssignReviewers(ctx context.
 	}
 	insertReviewersSQL.WriteString(strings.Join(insertReviewersValues, ", "))
 
+	tx, err := r.conn.GetPool().Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", operationPlace, err)
+	}
+	defer func() {
+		tx.Rollback(ctx)
+	}()
+
 	var pullRequestDb dto.PullRequestDB
-	prRow := r.conn.GetPool().QueryRow(ctx, insertPullRequestSQL, prData.ID, prData.Name, prData.AuthorID)
-	err := prRow.Scan(
+
+	prRow := tx.QueryRow(ctx, insertPullRequestSQL, prData.ID, prData.Name, prData.AuthorID)
+	err = prRow.Scan(
 		&pullRequestDb.ID,
 		&pullRequestDb.Name,
 		&pullRequestDb.AuthorID,
@@ -43,10 +52,14 @@ func (r *PullRequestRepository) CreatePullRequestAndAssignReviewers(ctx context.
 		return nil, fmt.Errorf("%s:insertPullRequestSQL:%w", operationPlace, err)
 	}
 	if len(reviewerIDs) > 0 {
-		_, err = r.conn.GetPool().Exec(ctx, insertReviewersSQL.String(), insertReviewersArgs...)
+		_, err = tx.Exec(ctx, insertReviewersSQL.String(), insertReviewersArgs...)
 		if err != nil {
 			return nil, fmt.Errorf("%s:insertReviewersSQL:%w", operationPlace, err)
 		}
+	}
+	err = tx.Commit(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", operationPlace, err)
 	}
 	res := converters.PullRequestDBToDomain(pullRequestDb)
 	return &res, nil
