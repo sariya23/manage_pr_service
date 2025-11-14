@@ -1,13 +1,39 @@
 package service_pull_request
 
-import "log/slog"
+import (
+	"context"
+	"log/slog"
 
-type PullRequestService struct {
-	log *slog.Logger
+	"github.com/sariya23/manage_pr_service/internal/models/domain"
+	"github.com/sariya23/manage_pr_service/internal/models/dto"
+)
+
+type UserRepository interface {
+	GetUserByID(ctx context.Context, userID string) (*domain.User, error)
 }
 
-func NewPullRequestService(log *slog.Logger) *PullRequestService {
+type PullRequestRepository interface {
+	GetPullRequest(ctx context.Context, prID string) (*domain.PullRequest, error)
+	CreatePullRequestAndAssignReviewers(ctx context.Context, dto dto.CreatePullRequestDTO, reviewerIDs []string) (*domain.PullRequest, error)
+}
+
+type TeamRepository interface {
+	GetUserTeam(ctx context.Context, userID string) (string, error)
+	GetTeamMembers(ctx context.Context, teamName string) ([]domain.User, error)
+}
+
+type PullRequestService struct {
+	log             *slog.Logger
+	PullRequestRepo PullRequestRepository
+	UserRepo        UserRepository
+	TeamRepo        TeamRepository
+}
+
+func NewPullRequestService(log *slog.Logger, prRepo PullRequestRepository, userRepo UserRepository, teamRepo TeamRepository) *PullRequestService {
 	return &PullRequestService{
-		log: log,
+		log:             log,
+		PullRequestRepo: prRepo,
+		UserRepo:        userRepo,
+		TeamRepo:        teamRepo,
 	}
 }
