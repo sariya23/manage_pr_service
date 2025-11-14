@@ -69,6 +69,13 @@ func TestPullRequestReassign(t *testing.T) {
 			expectedResp:    erresponse.MakeInternalResponse("internal server error"),
 			expectedIsError: true,
 		},
+		{
+			name:            "user not in PR team",
+			inputErr:        outerror.ErrUserNotInPullRequestTeam,
+			expectedStatus:  http.StatusBadRequest,
+			expectedResp:    erresponse.MakeInvalidResponse("user not in PR team"),
+			expectedIsError: true,
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

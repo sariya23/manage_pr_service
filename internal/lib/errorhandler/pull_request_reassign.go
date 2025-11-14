@@ -23,7 +23,8 @@ func PullRequestReassign(err error) (status int, resp api.ErrorResponse, isError
 		return http.StatusConflict, erresponse.MakePullRequestUserNotReviewerResponse("reviewer is not assigned to this PR"), true
 	} else if errors.Is(err, outerror.ErrNoReviewerCandidates) {
 		return http.StatusConflict, erresponse.MakePullRequestNoCandidateResponse("no active replacement candidate in team"), true
+	} else if errors.Is(err, outerror.ErrUserNotInPullRequestTeam) {
+		return http.StatusBadRequest, erresponse.MakeInvalidResponse("user not in PR team"), true
 	}
-
 	return http.StatusInternalServerError, erresponse.MakeInternalResponse("internal server error"), true
 }

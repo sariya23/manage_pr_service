@@ -16,6 +16,7 @@ type PullRequestRepository interface {
 	GetPullRequest(ctx context.Context, prID string) (*domain.PullRequest, error)
 	CreatePullRequestAndAssignReviewers(ctx context.Context, dtoPR dto.CreatePullRequestDTO, reviewerIDs []string) (*domain.PullRequest, error)
 	MergePullRequest(ctx context.Context, prID string) (*domain.PullRequest, error)
+	ReassignPullRequest(ctx context.Context, prID string, oldReviewerID, newReviewerID string) (*domain.PullRequest, error)
 }
 
 type TeamRepository interface {
