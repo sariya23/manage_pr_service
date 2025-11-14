@@ -3,6 +3,7 @@ package converters
 import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
+	"github.com/sariya23/manage_pr_service/internal/models/dto"
 )
 
 func DomainPullRequestToGetReviewResponse(domainPR domain.PullRequest) api.PullRequestShort {
@@ -28,7 +29,25 @@ func DomainPullRequestToCreatePullRequestResponse(domainPR domain.PullRequest) a
 	pr.AuthorId = domainPR.AuthorID
 	pr.PullRequestName = domainPR.Name
 	pr.Status = api.PullRequestStatus(domainPR.Status)
-	pr.MergedAt = &domainPR.MergedAt
+	pr.MergedAt = domainPR.MergedAt
 	pr.CreatedAt = &domainPR.CreatedAt
 	return pr
+}
+
+func PullRequestDBToDomain(dbPR dto.PullRequestDB) domain.PullRequest {
+
+	res := domain.PullRequest{
+		ID:       dbPR.ID,
+		AuthorID: dbPR.AuthorID,
+		Name:     dbPR.Name,
+		Status:   domain.PullRequestStatus(dbPR.Status),
+	}
+
+	if dbPR.MergedAt.Valid {
+		res.MergedAt = &dbPR.MergedAt.Time
+	}
+	if dbPR.CreatedAt.Valid {
+		res.CreatedAt = dbPR.CreatedAt.Time
+	}
+	return res
 }

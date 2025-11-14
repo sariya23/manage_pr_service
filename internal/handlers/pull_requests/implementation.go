@@ -17,7 +17,7 @@ type PullRequestImplementation struct {
 	prService PullRequestService
 }
 
-func NewTeamsImplementation(log *slog.Logger, prService PullRequestService) *PullRequestImplementation {
+func NewPullRequestImplementation(log *slog.Logger, prService PullRequestService) *PullRequestImplementation {
 	return &PullRequestImplementation{
 		logger:    log,
 		prService: prService,

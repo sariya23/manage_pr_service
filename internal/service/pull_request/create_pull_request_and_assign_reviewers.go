@@ -54,13 +54,13 @@ func (s *PullRequestService) CreatePullRequestAndAssignReviewers(ctx context.Con
 	}
 
 	reviewers := pickReviewersForPR(onlyActiveUsers(teamMembers), prData.AuthorID)
-
+	log.Info(fmt.Sprintf("%v", reviewers))
 	pullRequest, err := s.PullRequestRepo.CreatePullRequestAndAssignReviewers(ctx, prData, domain.UserIDs(reviewers))
 	if err != nil {
 		log.Error("cannot crate PR and assign reviewers", slog.String("pr_id", prData.ID), slog.String("error", err.Error()))
 		return nil, nil, fmt.Errorf("%s: %w", operationPlace, err)
 	}
-	return pullRequest, teamMembers, nil
+	return pullRequest, reviewers, nil
 }
 
 // onlyActiveUsers оставляет только активных юзеров

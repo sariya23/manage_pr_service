@@ -46,8 +46,7 @@ func (i *PullRequestImplementation) Create(w http.ResponseWriter, r *http.Reques
 		render.JSON(w, r, resp)
 		return
 	}
-
-	prRes := converters.DomainPullRequestToCreatePullRequestResponse(pullRequest)
+	prRes := converters.DomainPullRequestToCreatePullRequestResponse(*pullRequest)
 	prRes.AssignedReviewers = domain.UserIDs(reviewers)
 	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, api.PostPullRequestMerge200JSONResponse{

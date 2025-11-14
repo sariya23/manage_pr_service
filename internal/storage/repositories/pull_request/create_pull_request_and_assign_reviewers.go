@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/sariya23/manage_pr_service/internal/converters"
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/models/dto"
 )
 
-func (r *PullRequestRepository) CreatePullRequestAndAssignReviewers(ctx context.Context, dto dto.CreatePullRequestDTO, reviewerIDs []string) (*domain.PullRequest, error) {
+func (r *PullRequestRepository) CreatePullRequestAndAssignReviewers(ctx context.Context, prData dto.CreatePullRequestDTO, reviewerIDs []string) (*domain.PullRequest, error) {
 	const operationPlace = "storage.repositories.pull_request.create_pull_request_and_assign_reviewers"
 
 	insertPullRequestSQL := `insert into pull_request 
@@ -23,20 +24,20 @@ func (r *PullRequestRepository) CreatePullRequestAndAssignReviewers(ctx context.
 
 	for _, reviewerID := range reviewerIDs {
 		insertReviewersValues = append(insertReviewersValues, fmt.Sprintf("($%d, $%d)",
-			len(insertReviewersArgs),
-			len(insertReviewersArgs)+1))
-		insertReviewersArgs = append(insertReviewersArgs, reviewerID, dto.ID)
+			len(insertReviewersArgs)+1,
+			len(insertReviewersArgs)+2))
+		insertReviewersArgs = append(insertReviewersArgs, reviewerID, prData.ID)
 	}
 	insertReviewersSQL.WriteString(strings.Join(insertReviewersValues, ", "))
 
-	var pullRequest domain.PullRequest
-	prRow := r.conn.GetPool().QueryRow(ctx, insertPullRequestSQL, dto.ID, dto.Name, dto.AuthorID)
+	var pullRequestDb dto.PullRequestDB
+	prRow := r.conn.GetPool().QueryRow(ctx, insertPullRequestSQL, prData.ID, prData.Name, prData.AuthorID)
 	err := prRow.Scan(
-		&pullRequest.ID,
-		&pullRequest.Name,
-		&pullRequest.AuthorID,
-		&pullRequest.Status,
-		&pullRequest.CreatedAt,
+		&pullRequestDb.ID,
+		&pullRequestDb.Name,
+		&pullRequestDb.AuthorID,
+		&pullRequestDb.Status,
+		&pullRequestDb.CreatedAt,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("%s:insertPullRequestSQL:%w", operationPlace, err)
@@ -47,5 +48,6 @@ func (r *PullRequestRepository) CreatePullRequestAndAssignReviewers(ctx context.
 			return nil, fmt.Errorf("%s:insertReviewersSQL:%w", operationPlace, err)
 		}
 	}
-	return &pullRequest, nil
+	res := converters.PullRequestDBToDomain(pullRequestDb)
+	return &res, nil
 }

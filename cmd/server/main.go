@@ -11,8 +11,10 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/app/server"
 	cfg "github.com/sariya23/manage_pr_service/internal/config"
 	apidebug "github.com/sariya23/manage_pr_service/internal/handlers/debug"
+	api_pull_requests "github.com/sariya23/manage_pr_service/internal/handlers/pull_requests"
 	apiteams "github.com/sariya23/manage_pr_service/internal/handlers/teams"
 	apiusers "github.com/sariya23/manage_pr_service/internal/handlers/users"
+	service_pull_request "github.com/sariya23/manage_pr_service/internal/service/pull_request"
 	serviceteams "github.com/sariya23/manage_pr_service/internal/service/teams"
 	serviceusers "github.com/sariya23/manage_pr_service/internal/service/users"
 	"github.com/sariya23/manage_pr_service/internal/storage/database"
@@ -41,9 +43,11 @@ func main() {
 	pullRequestRepo := repo_pull_request.NewPullRequestRepository(db)
 	userService := serviceusers.NewUsersService(logger, userRepo, pullRequestRepo, teamRepo)
 	teamService := serviceteams.NewTeamsService(logger, teamRepo, userRepo)
+	pullRequestService := service_pull_request.NewPullRequestService(logger, pullRequestRepo, userRepo, teamRepo)
 	debugImpl := apidebug.NewDebugImplementation()
 	userImpl := apiusers.NewUsersImplementation(logger, userService)
 	teamsImpl := apiteams.NewTeamsImplementation(logger, teamService)
+	pullRequestImpl := api_pull_requests.NewPullRequestImplementation(logger, pullRequestService)
 	r.Route("/api", func(r chi.Router) {
 		r.Route("/debug", func(r chi.Router) {
 			r.Get("/ping", debugImpl.Ping)
@@ -55,6 +59,9 @@ func main() {
 		r.Route("/team", func(r chi.Router) {
 			r.Post("/add", teamsImpl.Add)
 			r.Get("/get/{team_name}", teamsImpl.Get)
+		})
+		r.Route("/pullRequest", func(r chi.Router) {
+			r.Post("/create", pullRequestImpl.Create)
 		})
 	})
 
