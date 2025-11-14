@@ -2,7 +2,6 @@ package api_pull_requests
 
 import (
 	"encoding/json"
-	"errors"
 	"log/slog"
 	"net/http"
 
@@ -10,9 +9,9 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
+	"github.com/sariya23/manage_pr_service/internal/lib/errorhandler"
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/models/dto"
-	"github.com/sariya23/manage_pr_service/internal/outerror"
 	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators/handlers/pull_request"
 )
 
@@ -41,19 +40,10 @@ func (i *PullRequestImplementation) Create(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	pullRequest, reviewers, err := i.prService.CreatePullRequest(ctx, dto.FromCreatePullRequestHTTP(request))
-	if err != nil {
-		if errors.Is(err, outerror.ErrPullRequestAlreadyExists) {
-			w.WriteHeader(http.StatusConflict)
-			render.JSON(w, r, erresponse.MakePullRequestAlreadyExistsResponse("PR id already exists"))
-			return
-		} else if errors.Is(err, outerror.ErrUserNotFound) {
-			w.WriteHeader(http.StatusConflict)
-			render.JSON(w, r, erresponse.MakeNotFoundResponse("author_id not found"))
-			return
-		}
-		w.WriteHeader(http.StatusInternalServerError)
-		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
+	pullRequest, reviewers, err := i.prService.CreatePullRequestAndAssignReviewers(ctx, dto.FromCreatePullRequestHTTP(request))
+	if status, resp, isError := errorhandler.PullRequestCreate(err); isError {
+		w.WriteHeader(status)
+		render.JSON(w, r, resp)
 		return
 	}
 
