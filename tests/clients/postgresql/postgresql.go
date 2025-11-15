@@ -51,7 +51,6 @@ func (d *TestDB) Truncate(ctx context.Context, tables ...string) {
 	}
 }
 
-// TEAMS
 func (d *TestDB) GetTeamMembersByTeamName(ctx context.Context, teamName string) []models.TeamMember {
 	const operationPlace = "clients.postgresql.NewTestDB"
 	getTeamMembersSQL := `select * from team_member where team_name=$1`
@@ -111,7 +110,6 @@ func (d *TestDB) GetUsersFromDB(ctx context.Context, userIDs []string) []models.
 	return users
 }
 
-// PullRequest
 func (d *TestDB) GetPullRequest(ctx context.Context, prID string) *models.PullRequest {
 	const operationPlace = "clients.postgresql.GetPullRequest"
 
