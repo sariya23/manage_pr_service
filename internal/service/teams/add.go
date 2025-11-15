@@ -33,7 +33,7 @@ func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest 
 	}
 
 	for _, member := range membersRequest {
-		if member.IsActive == false {
+		if !member.IsActive {
 			log.Warn("member is not active", slog.String("user_id", member.UserID))
 			return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrInactiveUser)
 		}

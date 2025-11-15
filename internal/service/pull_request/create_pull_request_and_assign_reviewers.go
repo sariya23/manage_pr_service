@@ -68,7 +68,7 @@ func onlyActiveUsers(users []domain.User) []domain.User {
 	var result []domain.User
 
 	for _, user := range users {
-		if user.IsActive == true {
+		if user.IsActive {
 			result = append(result, user)
 		}
 	}

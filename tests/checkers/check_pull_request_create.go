@@ -1,5 +1,3 @@
-//go:build integrations
-
 package checkers
 
 import (

@@ -2,7 +2,6 @@ package random
 
 import (
 	"math/rand"
-	"time"
 )
 
 func Sample[T any](slice []T, n int) []T {
@@ -15,8 +14,6 @@ func Sample[T any](slice []T, n int) []T {
 		copy(result, slice)
 		return result
 	}
-
-	rand.Seed(time.Now().UnixNano())
 	indices := rand.Perm(len(slice))[:n]
 
 	result := make([]T, n)

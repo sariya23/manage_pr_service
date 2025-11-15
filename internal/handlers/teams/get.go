@@ -45,5 +45,5 @@ func (i *TeamsImplementation) Get(w http.ResponseWriter, r *http.Request) {
 		TeamName: teamName,
 		Members:  converters.MultiDomainUserToGetTeamResponse(members),
 	})
-	return
+
 }

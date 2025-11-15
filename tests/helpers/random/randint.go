@@ -1,5 +1,3 @@
-//go:build integrations
-
 package random
 
 import "math/rand"

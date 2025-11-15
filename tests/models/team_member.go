@@ -1,5 +1,3 @@
-//go:build integrations
-
 package models
 
 import "sort"
