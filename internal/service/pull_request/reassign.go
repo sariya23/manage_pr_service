@@ -65,6 +65,10 @@ func (s *PullRequestService) Reassign(ctx context.Context, prID string, oldRevie
 			slog.String("team name", teamName))
 		return nil, "", fmt.Errorf("%s:%w", operationPlace, outerror.ErrUserNotInPullRequestTeam)
 	}
+	if !slices.Contains(pr.AssignedReviewerIDs, oldReviewerID) {
+		log.Warn("user not in PR assigned", slog.String("pr_id", prID), slog.String("old_reviewer_id", oldReviewerID))
+		return nil, "", fmt.Errorf("%s:%w", operationPlace, outerror.ErrUserIsNotReviewer)
+	}
 	excludedIDs := []string{pr.AuthorID, oldReviewerID}
 	excludedIDs = append(excludedIDs, pr.AssignedReviewerIDs...)
 	members = excludeUserIDsFromTeamMembers(onlyActiveUsers(members), excludedIDs)

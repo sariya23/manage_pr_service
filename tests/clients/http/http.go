@@ -63,3 +63,21 @@ func (c *HTTPClient) PullRequestCreate(req pull_request.PullRequestCreateRequest
 	}
 	return resp
 }
+
+func (c *HTTPClient) PullRequestMerge(req pull_request.PullRequestMergeRequest) *http.Response {
+	reqJson := req.ToJson()
+	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/merge", c.port), "application/json", reqJson)
+	if err != nil {
+		panic(err)
+	}
+	return resp
+}
+
+func (c *HTTPClient) PullRequestReassign(req pull_request.PullRequestReassignRequest) *http.Response {
+	reqJson := req.ToJson()
+	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/reassign", c.port), "application/json", reqJson)
+	if err != nil {
+		panic(err)
+	}
+	return resp
+}

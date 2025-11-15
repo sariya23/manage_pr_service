@@ -25,11 +25,11 @@ func (r PullRequestMergeRequest) ToJson() io.Reader {
 
 type PullRequestMergeResponsePullRequestDTO struct {
 	PullRequestID     string    `json:"pull_request_id"`
-	PullRequestName   int       `json:"pull_request_name"`
-	AuthorID          int       `json:"author_id"`
+	PullRequestName   string    `json:"pull_request_name"`
+	AuthorID          string    `json:"author_id"`
 	Status            string    `json:"status"`
-	AssignedReviewers int       `json:"assigned_reviewers"`
-	MergedAt          time.Time `json:"merged_at"`
+	AssignedReviewers []string  `json:"assigned_reviewers"`
+	MergedAt          time.Time `json:"mergedAt"`
 }
 
 type PullRequestMergeResponse struct {
@@ -39,7 +39,6 @@ type PullRequestMergeResponse struct {
 func PullRequestMergeFromHTTPResponseOK(resp *http.Response) PullRequestMergeResponse {
 	const operationPlace = "factory.pull_request.merge.PullRequestMergeFromHTTPResponseOK"
 	defer resp.Body.Close()
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		panic(err.Error() + " " + operationPlace)
