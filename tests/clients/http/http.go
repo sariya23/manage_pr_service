@@ -10,6 +10,7 @@ import (
 
 	"github.com/sariya23/manage_pr_service/internal/config"
 	"github.com/sariya23/manage_pr_service/tests/factory/teams"
+	"github.com/sariya23/manage_pr_service/tests/factory/users"
 )
 
 type HTTPClient struct {
@@ -38,6 +39,15 @@ func (c *HTTPClient) TeamsAdd(req teams.AddTeamRequest) *http.Response {
 
 func (c *HTTPClient) TeamGet(teamName string) *http.Response {
 	resp, err := c.cl.Get(fmt.Sprintf("http://localhost:%d/api/team/get/%s", c.port, teamName))
+	if err != nil {
+		panic(err)
+	}
+	return resp
+}
+
+func (c *HTTPClient) UsersSetIsActive(req users.SetIsActiveRequest) *http.Response {
+	reqJson := req.ToJson()
+	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/users/setIsActive", c.port), "application/json", reqJson)
 	if err != nil {
 		panic(err)
 	}
