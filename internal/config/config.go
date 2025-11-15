@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -25,6 +26,18 @@ func MustLoad() *Config {
 	configPath := fetchConfigPath()
 	if configPath == "" {
 		panic("config path is not specified")
+	}
+	cfg := Config{}
+	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
+		panic(fmt.Sprintf("cannot read config from file; err=%s", err.Error()))
+	}
+	return &cfg
+}
+
+// MustLoadByPath - загрузка конфига по пути.
+func MustLoadByPath(configPath string) *Config {
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		panic("config file does not exists: " + configPath)
 	}
 	cfg := Config{}
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
