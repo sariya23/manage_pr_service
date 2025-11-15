@@ -35,3 +35,11 @@ func (c *HTTPClient) TeamsAdd(req teams.AddTeamRequest) *http.Response {
 	}
 	return resp
 }
+
+func (c *HTTPClient) TeamGet(teamName string) *http.Response {
+	resp, err := c.cl.Get(fmt.Sprintf("http://localhost:%d/api/team/get/%s", c.port, teamName))
+	if err != nil {
+		panic(err)
+	}
+	return resp
+}

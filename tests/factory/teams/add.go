@@ -23,6 +23,9 @@ func RandomInitAddTeamRequestMemberDT(userID string, username string, isActive *
 	}
 	if username == "" {
 		username = gofakeit.Username()
+		if len(username) > 37 {
+			username = username[:37]
+		}
 	}
 	var active bool
 	if isActive == nil {
@@ -92,7 +95,7 @@ type AddTeamResponse struct {
 	Team AddTeamResponseTeamDTO `json:"team"`
 }
 
-func FromHTTPResponseOK(resp *http.Response) AddTeamResponse {
+func AddTeamRFromHTTPResponseOK(resp *http.Response) AddTeamResponse {
 	const operationPlace = "factory.teams.add.FromHTTPResponse"
 	defer resp.Body.Close()
 

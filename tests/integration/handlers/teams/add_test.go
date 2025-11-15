@@ -29,7 +29,7 @@ func TestAddTeam_NewTeamNewUsers(t *testing.T) {
 
 	response := httpClient.TeamsAdd(request)
 	require.Equal(t, http.StatusOK, response.StatusCode)
-	responseDTO := factory_teams.FromHTTPResponseOK(response)
+	responseDTO := factory_teams.AddTeamRFromHTTPResponseOK(response)
 	teamMembersDB := dbT.GetTeamMembersByTeamName(ctx, request.TeamName)
 	usersDB := dbT.GetUsersFromDB(ctx, factory.TeamMemberUserIDs(teamMembersDB))
 	checkers_team.CheckAddTeamResponse(t, responseDTO, teamMembersDB, usersDB)
@@ -61,7 +61,7 @@ func TestAddTeam_AddUsersToTeam(t *testing.T) {
 	requestAddTeam := factory_teams.RandomInitAddTeamRequest(requestCreateTeam.TeamName, newMembers)
 	responseAddTeam := httpClient.TeamsAdd(requestAddTeam)
 	require.Equal(t, http.StatusOK, responseAddTeam.StatusCode)
-	responseDTO := factory_teams.FromHTTPResponseOK(responseAddTeam)
+	responseDTO := factory_teams.AddTeamRFromHTTPResponseOK(responseAddTeam)
 	teamMembersDB := dbT.GetTeamMembersByTeamName(ctx, requestAddTeam.TeamName)
 	usersDB := dbT.GetUsersFromDB(ctx, factory.TeamMemberUserIDs(teamMembersDB))
 	checkers_team.CheckAddTeamResponse(t, responseDTO, teamMembersDB, usersDB)
