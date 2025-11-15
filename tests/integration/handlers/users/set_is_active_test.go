@@ -54,3 +54,12 @@ func TestSetIsActive_NonexistentUser(t *testing.T) {
 	response := httpClient.UsersSetIsActive(request)
 	require.Equal(t, http.StatusNotFound, response.StatusCode)
 }
+
+// TestSetIsActive_EmptyUserID тест ручки /api/users/setIsActive
+// Пустой айдишник пользователя
+func TestSetIsActive_EmptyUserID(t *testing.T) {
+	httpClient := httpcleint.NewHTTPClient()
+	request := factory_users.SetIsActiveRequest{UserID: "", IsActive: false}
+	response := httpClient.UsersSetIsActive(request)
+	require.Equal(t, http.StatusBadRequest, response.StatusCode)
+}

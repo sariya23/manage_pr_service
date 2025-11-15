@@ -37,7 +37,7 @@ func TestPullRequestCreate(t *testing.T) {
 		{
 			name:        "user not found",
 			err:         outerror.ErrUserNotFound,
-			wantStatus:  http.StatusBadRequest,
+			wantStatus:  http.StatusNotFound,
 			wantResp:    erresponse.MakeNotFoundResponse("author_id not found"),
 			wantIsError: true,
 		},

@@ -17,7 +17,7 @@ func PullRequestCreate(err error) (status int, resp api.ErrorResponse, isError b
 	if errors.Is(err, outerror.ErrPullRequestAlreadyExists) {
 		return http.StatusConflict, erresponse.MakePullRequestAlreadyExistsResponse("PR id already exists"), true
 	} else if errors.Is(err, outerror.ErrUserNotFound) {
-		return http.StatusBadRequest, erresponse.MakeNotFoundResponse("author_id not found"), true
+		return http.StatusNotFound, erresponse.MakeNotFoundResponse("author_id not found"), true
 	} else if errors.Is(err, outerror.ErrUserNotInAnyTeam) {
 		return http.StatusBadRequest, erresponse.MakeNotFoundResponse("author_id not in any team"), true
 	}

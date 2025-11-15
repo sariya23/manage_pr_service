@@ -38,6 +38,7 @@ func TestTeamGet(t *testing.T) {
 }
 
 // TestTeamGet_NonexistentTeam тест на ручку /api/team/get
+// Команда не найдена
 func TestTeamGet_NonexistentTeam(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
 	response := httpClient.TeamGet(gofakeit.LetterN(10))

@@ -3,6 +3,7 @@
 package checkers_pull_request
 
 import (
+	"slices"
 	"sort"
 	"testing"
 
@@ -24,4 +25,5 @@ func CheckPullRequestCreateResponse(t *testing.T, responseDTO factory_pull_reque
 		return responseDTO.PR.AssignedReviewers[i] < responseDTO.PR.AssignedReviewers[j]
 	})
 	assert.Equal(t, pullRequestDB.AssignedReviewerIDs, responseDTO.PR.AssignedReviewers)
+	assert.False(t, slices.Contains(pullRequestDB.AssignedReviewerIDs, pullRequestDB.AuthorID))
 }
