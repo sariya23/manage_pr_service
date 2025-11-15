@@ -1,8 +1,10 @@
 package random
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 // RandInt случайное число в диапазоне [min, max]
-func RandInt(min, max int) int {
-	return rand.Intn(max-min+1) + min
+func RandInt(start, end int) int {
+	return rand.Intn(end-start+1) + start
 }

@@ -1,4 +1,4 @@
-package repo_pull_request
+package pullrequest
 
 import (
 	"context"

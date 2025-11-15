@@ -1,4 +1,4 @@
-package api_pull_requests
+package pullrequest
 
 import (
 	"encoding/json"
@@ -10,7 +10,7 @@ import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/lib/errorhandler"
-	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators/handlers/pull_request"
+	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators"
 )
 
 func (i *PullRequestImplementation) Reassign(w http.ResponseWriter, r *http.Request) {

@@ -12,8 +12,8 @@ type SetIsActiveRequest struct {
 	IsActive bool   `json:"is_active"`
 }
 
-func (r SetIsActiveRequest) ToJson() io.Reader {
-	const operationPlace = "factory.users.set_is_active.SetIsActiveRequest.ToJson"
+func (r SetIsActiveRequest) ToJSON() io.Reader {
+	const operationPlace = "factory.users.set_is_active.SetIsActiveRequest.ToJSON"
 	body, err := json.Marshal(r)
 	if err != nil {
 		panic(err.Error() + " " + operationPlace)

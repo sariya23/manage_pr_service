@@ -1,4 +1,4 @@
-package api_pull_requests
+package pullrequest
 
 import (
 	"encoding/json"
@@ -11,7 +11,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/lib/errorhandler"
 	"github.com/sariya23/manage_pr_service/internal/models/dto"
-	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators/handlers/pull_request"
+	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators"
 )
 
 func (i *PullRequestImplementation) Create(w http.ResponseWriter, r *http.Request) {

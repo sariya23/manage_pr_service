@@ -33,8 +33,8 @@ func (pr *PullRequestCreateRequest) RadnomInit(prID string, prName string, autho
 	pr.AuthorID = authorID
 }
 
-func (pr *PullRequestCreateRequest) ToJson() io.Reader {
-	const operationPlace = "factory.pull_request.create.PullRequestCreateRequest.ToJson"
+func (pr *PullRequestCreateRequest) ToJSON() io.Reader {
+	const operationPlace = "factory.pull_request.create.PullRequestCreateRequest.ToJSON"
 	body, err := json.Marshal(pr)
 	if err != nil {
 		panic(err.Error() + " " + operationPlace)

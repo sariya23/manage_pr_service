@@ -1,4 +1,4 @@
-package pull_request_validators
+package validators
 
 import api "github.com/sariya23/manage_pr_service/internal/generated"
 

@@ -12,8 +12,8 @@ type PullRequestMergeRequest struct {
 	PullRequestID string `json:"pull_request_id"`
 }
 
-func (r PullRequestMergeRequest) ToJson() io.Reader {
-	const operationPlace = "factory.pull_request.merge.PullRequestMergeRequest.ToJson"
+func (r PullRequestMergeRequest) ToJSON() io.Reader {
+	const operationPlace = "factory.pull_request.merge.PullRequestMergeRequest.ToJSON"
 	body, err := json.Marshal(r)
 	if err != nil {
 		panic(err.Error() + " " + operationPlace)

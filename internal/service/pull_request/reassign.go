@@ -1,4 +1,4 @@
-package service_pull_request
+package pullrequest
 
 import (
 	"context"

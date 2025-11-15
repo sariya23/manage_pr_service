@@ -7,21 +7,21 @@ import (
 
 func MakeInvalidResponse(msg string) api.ErrorResponse {
 	errorResp := api.ErrorResponse{}
-	errorResp.Error.Code = handlers.INVALID_REQUEST
+	errorResp.Error.Code = handlers.INVALIDREQUEST
 	errorResp.Error.Message = msg
 	return errorResp
 }
 
 func MakeNotFoundResponse(msg string) api.ErrorResponse {
 	errorResp := api.ErrorResponse{}
-	errorResp.Error.Code = handlers.NOT_FOUND
+	errorResp.Error.Code = handlers.NOTFOUND
 	errorResp.Error.Message = msg
 	return errorResp
 }
 
 func MakeTeamAlreadyExistsResponse(msg string) api.ErrorResponse {
 	errorResp := api.ErrorResponse{}
-	errorResp.Error.Code = handlers.TEAM_ALREADY_EXISTS
+	errorResp.Error.Code = handlers.TEAMALREADYEXISTS
 	errorResp.Error.Message = msg
 	return errorResp
 }
@@ -35,28 +35,28 @@ func MakeInternalResponse(msg string) api.ErrorResponse {
 
 func MakePullRequestAlreadyExistsResponse(msg string) api.ErrorResponse {
 	errorResp := api.ErrorResponse{}
-	errorResp.Error.Code = handlers.PULL_REQUEST_ALREADY_EXISTS
+	errorResp.Error.Code = handlers.PULLREQUESTALREADYEXISTS
 	errorResp.Error.Message = msg
 	return errorResp
 }
 
 func MakePullRequestMergedResponse(msg string) api.ErrorResponse {
 	errorResp := api.ErrorResponse{}
-	errorResp.Error.Code = handlers.PULL_REQUEST_MERGED
+	errorResp.Error.Code = handlers.PULLREQUESTMERGED
 	errorResp.Error.Message = msg
 	return errorResp
 }
 
 func MakePullRequestUserNotReviewerResponse(msg string) api.ErrorResponse {
 	errorResp := api.ErrorResponse{}
-	errorResp.Error.Code = handlers.USER_NOT_REVIEWER
+	errorResp.Error.Code = handlers.USERNOTREVIEWER
 	errorResp.Error.Message = msg
 	return errorResp
 }
 
 func MakePullRequestNoCandidateResponse(msg string) api.ErrorResponse {
 	errorResp := api.ErrorResponse{}
-	errorResp.Error.Code = handlers.NO_CANDIDATE
+	errorResp.Error.Code = handlers.NOCANDIDATE
 	errorResp.Error.Message = msg
 	return errorResp
 }

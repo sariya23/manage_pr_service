@@ -11,7 +11,7 @@ import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
-	validators "github.com/sariya23/manage_pr_service/internal/validators/handlers/users"
+	"github.com/sariya23/manage_pr_service/internal/validators"
 )
 
 func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request) {

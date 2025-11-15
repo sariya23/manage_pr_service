@@ -1,4 +1,4 @@
-package repo_pull_request
+package pullrequest
 
 import (
 	"github.com/sariya23/manage_pr_service/internal/storage/database"

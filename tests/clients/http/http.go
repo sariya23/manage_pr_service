@@ -28,7 +28,7 @@ func (c *HTTPClient) GetClient() *http.Client {
 }
 
 func (c *HTTPClient) TeamsAdd(req factory.AddTeamRequest) *http.Response {
-	reqJson := req.ToJson()
+	reqJson := req.ToJSON()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/team/add", c.port), "application/json", reqJson)
 	if err != nil {
 		panic(err)
@@ -45,7 +45,7 @@ func (c *HTTPClient) TeamGet(teamName string) *http.Response {
 }
 
 func (c *HTTPClient) UsersSetIsActive(req factory.SetIsActiveRequest) *http.Response {
-	reqJson := req.ToJson()
+	reqJson := req.ToJSON()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/users/setIsActive", c.port), "application/json", reqJson)
 	if err != nil {
 		panic(err)
@@ -62,7 +62,7 @@ func (c *HTTPClient) UsersGetReview(userID string) *http.Response {
 }
 
 func (c *HTTPClient) PullRequestCreate(req factory.PullRequestCreateRequest) *http.Response {
-	reqJson := req.ToJson()
+	reqJson := req.ToJSON()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/create", c.port), "application/json", reqJson)
 	if err != nil {
 		panic(err)
@@ -71,7 +71,7 @@ func (c *HTTPClient) PullRequestCreate(req factory.PullRequestCreateRequest) *ht
 }
 
 func (c *HTTPClient) PullRequestMerge(req factory.PullRequestMergeRequest) *http.Response {
-	reqJson := req.ToJson()
+	reqJson := req.ToJSON()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/merge", c.port), "application/json", reqJson)
 	if err != nil {
 		panic(err)
@@ -80,7 +80,7 @@ func (c *HTTPClient) PullRequestMerge(req factory.PullRequestMergeRequest) *http
 }
 
 func (c *HTTPClient) PullRequestReassign(req factory.PullRequestReassignRequest) *http.Response {
-	reqJson := req.ToJson()
+	reqJson := req.ToJSON()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/reassign", c.port), "application/json", reqJson)
 	if err != nil {
 		panic(err)

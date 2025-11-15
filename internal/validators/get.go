@@ -1,4 +1,4 @@
-package teamsvalidators
+package validators
 
 func ValidateTeamGet(teamName string) (string, bool) {
 	if teamName == "" {

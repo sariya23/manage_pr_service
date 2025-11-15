@@ -1,8 +1,7 @@
-package pull_request_validators
+package validators
 
 import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
-	validators "github.com/sariya23/manage_pr_service/internal/validators/handlers"
 )
 
 func ValidatePullRequestCreateRequest(request api.PostPullRequestCreateJSONRequestBody) (string, bool) {
@@ -13,7 +12,7 @@ func ValidatePullRequestCreateRequest(request api.PostPullRequestCreateJSONReque
 		return "pull_request_name is required", false
 	}
 
-	if msg, valid := validators.ValidateUserID(request.AuthorId); !valid {
+	if msg, valid := ValidateUserID(request.AuthorId); !valid {
 		return msg, false
 	}
 	return "OK", true

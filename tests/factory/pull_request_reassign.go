@@ -12,8 +12,8 @@ type PullRequestReassignRequest struct {
 	OldUserID     string `json:"old_user_id"`
 }
 
-func (r PullRequestReassignRequest) ToJson() io.Reader {
-	const operationPlace = "factory.pull_request.reassign.PullRequestReassignRequest.ToJson"
+func (r PullRequestReassignRequest) ToJSON() io.Reader {
+	const operationPlace = "factory.pull_request.reassign.PullRequestReassignRequest.ToJSON"
 	body, err := json.Marshal(r)
 	if err != nil {
 		panic(err.Error() + " " + operationPlace)

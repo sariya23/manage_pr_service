@@ -46,8 +46,8 @@ type AddTeamRequest struct {
 	Members  []AddTeamRequestMemberDTO `json:"members"`
 }
 
-func (r *AddTeamRequest) ToJson() io.Reader {
-	const operationPlace = "factory.teams.add.AddTeamRequest.ToJson"
+func (r *AddTeamRequest) ToJSON() io.Reader {
+	const operationPlace = "factory.teams.add.AddTeamRequest.ToJSON"
 	body, err := json.Marshal(r)
 	if err != nil {
 		panic(err.Error() + " " + operationPlace)

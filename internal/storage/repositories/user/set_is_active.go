@@ -1,4 +1,4 @@
-package repo_user
+package user
 
 import (
 	"context"
@@ -28,9 +28,9 @@ func (u *UserRepository) SetIsActive(ctx context.Context, userID string, isActiv
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, fmt.Errorf("%s: %w", operationPlace, outerror.ErrUserNotFound)
-		} else {
-			return nil, fmt.Errorf("%s: %w", operationPlace, err)
 		}
+		return nil, fmt.Errorf("%s: %w", operationPlace, err)
+
 	}
 	return &user, nil
 }

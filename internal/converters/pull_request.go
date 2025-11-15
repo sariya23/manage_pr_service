@@ -41,7 +41,7 @@ func PullRequestDBToDomain(dbPR dto.PullRequestDB) domain.PullRequest {
 		ID:                  dbPR.ID,
 		AuthorID:            dbPR.AuthorID,
 		Name:                dbPR.Name,
-		Status:              domain.PullRequestStatus(dbPR.Status),
+		Status:              dbPR.Status,
 		AssignedReviewerIDs: dbPR.AssignedReviewerIDs,
 	}
 

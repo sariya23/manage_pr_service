@@ -1,4 +1,4 @@
-package repo_team
+package team
 
 import (
 	"context"

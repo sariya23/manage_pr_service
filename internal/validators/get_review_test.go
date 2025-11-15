@@ -1,4 +1,4 @@
-package usersvalidators
+package validators
 
 import (
 	"testing"
@@ -7,23 +7,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValidateSetIsActiveUserRequest(t *testing.T) {
+func TestValidateGetUserReviewRequest(t *testing.T) {
 	t.Parallel()
 	cases := []struct {
 		name          string
-		request       api.PostUsersSetIsActiveJSONRequestBody
+		request       api.GetUsersGetReviewRequestObject
 		expectedValid bool
 		expectedMsg   string
 	}{
 		{
 			name:          "Empty user id",
-			request:       api.PostUsersSetIsActiveJSONRequestBody{IsActive: false, UserId: ""},
+			request:       api.GetUsersGetReviewRequestObject{Params: api.GetUsersGetReviewParams{UserId: ""}},
 			expectedValid: false,
 			expectedMsg:   "user_id is required",
 		},
 		{
 			name:          "OK",
-			request:       api.PostUsersSetIsActiveJSONRequestBody{IsActive: false, UserId: "123"},
+			request:       api.GetUsersGetReviewRequestObject{Params: api.GetUsersGetReviewParams{UserId: "22"}},
 			expectedValid: true,
 			expectedMsg:   "OK",
 		},
@@ -31,7 +31,7 @@ func TestValidateSetIsActiveUserRequest(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			t.Parallel()
-			msg, valid := ValidateSetIsActiveUserRequest(c.request)
+			msg, valid := ValidateGetUserReviewRequest(c.request.Params.UserId)
 			assert.Equal(t, c.expectedValid, valid)
 			assert.Equal(t, c.expectedMsg, msg)
 		})

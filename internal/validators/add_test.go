@@ -1,4 +1,4 @@
-package teamsvalidators
+package validators
 
 import (
 	"testing"
