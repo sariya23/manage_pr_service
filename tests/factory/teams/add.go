@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"sort"
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
@@ -74,6 +75,12 @@ type AddTeamResponseMemberDTO struct {
 	UserID   string `json:"user_id"`
 	Username string `json:"username"`
 	IsActive bool   `json:"is_active"`
+}
+
+func AddTeamResponseMemberSortByUserID(teamMembers []AddTeamResponseMemberDTO) {
+	sort.Slice(teamMembers, func(i, j int) bool {
+		return teamMembers[i].UserID < teamMembers[j].UserID
+	})
 }
 
 type AddTeamResponseTeamDTO struct {
