@@ -39,11 +39,6 @@ func NewTestDB() *TestDB {
 	return &TestDB{DB: DB}
 }
 
-func (d *TestDB) SetUp(ctx context.Context, t *testing.T, tablenames ...string) {
-	t.Helper()
-	d.Truncate(ctx, tablenames...)
-}
-
 func (d *TestDB) TearDown(t *testing.T) {
 	t.Helper()
 }

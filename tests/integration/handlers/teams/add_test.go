@@ -1,3 +1,5 @@
+//go:build integrations
+
 package teams
 
 import (
@@ -13,11 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// TestAddTeam_NewTeamNewUsers тест ручки /api/team/add
+// Создание новой команды и новых юзеров
 func TestAddTeam_NewTeamNewUsers(t *testing.T) {
 	ctx := context.Background()
 	httpClient := httpcleint.NewHTTPClient()
-	dbT.SetUp(ctx, t, tables...)
-	defer dbT.TearDown(t)
 	members := []factory_teams.AddTeamRequestMemberDTO{}
 	for range random.RandInt(1, 3) {
 		isActive := true
@@ -27,17 +29,17 @@ func TestAddTeam_NewTeamNewUsers(t *testing.T) {
 
 	response := httpClient.TeamsAdd(request)
 	require.Equal(t, http.StatusOK, response.StatusCode)
-	responseDTO := factory_teams.FromHTTPResponse(response)
+	responseDTO := factory_teams.FromHTTPResponseOK(response)
 	teamMembersDB := dbT.GetTeamMembersByTeamName(ctx, request.TeamName)
 	usersDB := dbT.GetUsersFromDB(ctx, factory.TeamMemberUserIDs(teamMembersDB))
 	checkers_team.CheckAddTeamResponse(t, responseDTO, teamMembersDB, usersDB)
 }
 
+// TestAddTeam_AddUsersToTeam тест ручки /api/team/add
+// Добавление новых юзеров в существующую команду
 func TestAddTeam_AddUsersToTeam(t *testing.T) {
 	ctx := context.Background()
 	httpClient := httpcleint.NewHTTPClient()
-	dbT.SetUp(ctx, t, tables...)
-	defer dbT.TearDown(t)
 	// Предварительно создаем команду с юзерами
 	nUsers := random.RandInt(1, 3)
 	membersInit := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
@@ -56,11 +58,55 @@ func TestAddTeam_AddUsersToTeam(t *testing.T) {
 		membersInit = append(membersInit, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
 
-	requestAddTeam := factory_teams.RandomInitAddTeamRequest("", newMembers)
+	requestAddTeam := factory_teams.RandomInitAddTeamRequest(requestCreateTeam.TeamName, newMembers)
 	responseAddTeam := httpClient.TeamsAdd(requestAddTeam)
 	require.Equal(t, http.StatusOK, responseAddTeam.StatusCode)
-	responseDTO := factory_teams.FromHTTPResponse(responseAddTeam)
+	responseDTO := factory_teams.FromHTTPResponseOK(responseAddTeam)
 	teamMembersDB := dbT.GetTeamMembersByTeamName(ctx, requestAddTeam.TeamName)
 	usersDB := dbT.GetUsersFromDB(ctx, factory.TeamMemberUserIDs(teamMembersDB))
 	checkers_team.CheckAddTeamResponse(t, responseDTO, teamMembersDB, usersDB)
+}
+
+// TestAddTeam_InActiveUsers тест ручки /api/team/add
+// Если хотя бы один пользователь неактивен, то возвращается ошибка
+func TestAddTeam_InActiveUsers(t *testing.T) {
+	httpClient := httpcleint.NewHTTPClient()
+	nUsers := random.RandInt(1, 3)
+	membersInit := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	for range nUsers {
+		isActive := true
+		membersInit = append(membersInit, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+	}
+	diactive := false
+	membersInit = append(membersInit, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &diactive))
+	request := factory_teams.RandomInitAddTeamRequest("", membersInit)
+	response := httpClient.TeamsAdd(request)
+	require.Equal(t, http.StatusBadRequest, response.StatusCode)
+}
+
+// // TestAddTeam_InActiveUsers тест ручки /api/team/add
+// // При попытке добавить пользователя из другой команды возвращается ошибка
+func TestAddTeam_UserFromAnotherTeam(t *testing.T) {
+	//ctx := context.Background()
+	httpClient := httpcleint.NewHTTPClient()
+	nUsers := random.RandInt(1, 3)
+	membersInit := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	for range nUsers {
+		isActive := true
+		membersInit = append(membersInit, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+	}
+	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", membersInit)
+	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
+	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
+	user := random.Choice(membersInit)
+	nUsers = random.RandInt(1, 3)
+	membersAdd := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers+1)
+	membersAdd = append(membersAdd, user)
+	for range nUsers {
+		isActive := true
+		membersAdd = append(membersAdd, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+	}
+	request := factory_teams.RandomInitAddTeamRequest("", membersAdd)
+	response := httpClient.TeamsAdd(request)
+	require.Equal(t, http.StatusBadRequest, response.StatusCode)
 }

@@ -92,7 +92,7 @@ type AddTeamResponse struct {
 	Team AddTeamResponseTeamDTO `json:"team"`
 }
 
-func FromHTTPResponse(resp *http.Response) AddTeamResponse {
+func FromHTTPResponseOK(resp *http.Response) AddTeamResponse {
 	const operationPlace = "factory.teams.add.FromHTTPResponse"
 	defer resp.Body.Close()
 
