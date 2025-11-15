@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/sariya23/manage_pr_service/internal/config"
+	"github.com/sariya23/manage_pr_service/tests/factory/pull_request"
 	"github.com/sariya23/manage_pr_service/tests/factory/teams"
 	"github.com/sariya23/manage_pr_service/tests/factory/users"
 )
@@ -48,6 +49,15 @@ func (c *HTTPClient) TeamGet(teamName string) *http.Response {
 func (c *HTTPClient) UsersSetIsActive(req users.SetIsActiveRequest) *http.Response {
 	reqJson := req.ToJson()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/users/setIsActive", c.port), "application/json", reqJson)
+	if err != nil {
+		panic(err)
+	}
+	return resp
+}
+
+func (c *HTTPClient) PullRequestCreate(req pull_request.PullRequestCreateRequest) *http.Response {
+	reqJson := req.ToJson()
+	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/create", c.port), "application/json", reqJson)
 	if err != nil {
 		panic(err)
 	}

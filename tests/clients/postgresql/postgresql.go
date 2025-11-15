@@ -109,3 +109,24 @@ func (d *TestDB) GetUsersFromDB(ctx context.Context, userIDs []string) []factory
 	}
 	return users
 }
+
+// PullRequest
+func (d *TestDB) GetPullRequest(ctx context.Context, prID string) *factory.PullRequest {
+	const operationPlace = "clients.postgresql.GetPullRequest"
+
+	getPullRequestSQL := `select * from pull_request where pull_request_id=$1`
+	row := d.DB.GetPool().QueryRow(ctx, getPullRequestSQL, prID)
+	var prDB factory.PullRequestDB
+	err := row.Scan(
+		&prDB.ID,
+		&prDB.Name,
+		&prDB.AuthorID,
+		&prDB.Status,
+		&prDB.MergedAt,
+		&prDB.CreatedAt,
+		&prDB.AssignedReviewerIDs)
+	if err != nil {
+		panic(err.Error() + " " + operationPlace)
+	}
+	return prDB.ToDomain()
+}

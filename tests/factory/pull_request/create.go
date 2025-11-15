@@ -1,3 +1,5 @@
+//go:build integrations
+
 package pull_request
 
 import (
@@ -5,12 +7,32 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+
+	"github.com/brianvoe/gofakeit/v7"
 )
 
 type PullRequestCreateRequest struct {
 	PullRequestID   string `json:"pull_request_id"`
-	PullRequestName int    `json:"pull_request_name"`
-	AuthorID        int    `json:"author_id"`
+	PullRequestName string `json:"pull_request_name"`
+	AuthorID        string `json:"author_id"`
+}
+
+func (pr *PullRequestCreateRequest) RadnomInit(prID string, prName string, authorID string) {
+	if prID == "" {
+		prID = gofakeit.LetterN(8)
+	}
+
+	if prName == "" {
+		prName = gofakeit.AppName()
+	}
+
+	if authorID == "" {
+		authorID = gofakeit.LetterN(8)
+	}
+
+	pr.PullRequestID = prID
+	pr.PullRequestName = prName
+	pr.AuthorID = authorID
 }
 
 func (r PullRequestCreateRequest) ToJson() io.Reader {
@@ -23,11 +45,11 @@ func (r PullRequestCreateRequest) ToJson() io.Reader {
 }
 
 type PullRequestCreateResponsePullRequestDTO struct {
-	PullRequestID     string `json:"pull_request_id"`
-	PullRequestName   int    `json:"pull_request_name"`
-	AuthorID          int    `json:"author_id"`
-	Status            string `json:"status"`
-	AssignedReviewers int    `json:"assigned_reviewers"`
+	PullRequestID     string   `json:"pull_request_id"`
+	PullRequestName   string   `json:"pull_request_name"`
+	AuthorID          string   `json:"author_id"`
+	Status            string   `json:"status"`
+	AssignedReviewers []string `json:"assigned_reviewers"`
 }
 
 type PullRequestCreateResponse struct {

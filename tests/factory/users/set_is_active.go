@@ -1,3 +1,5 @@
+//go:build integrations
+
 package users
 
 import (
