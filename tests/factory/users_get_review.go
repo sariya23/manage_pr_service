@@ -1,6 +1,6 @@
 //go:build integrations
 
-package users
+package factory
 
 import (
 	"encoding/json"

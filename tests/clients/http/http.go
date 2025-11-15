@@ -9,9 +9,7 @@ import (
 	"time"
 
 	"github.com/sariya23/manage_pr_service/internal/config"
-	"github.com/sariya23/manage_pr_service/tests/factory/pull_request"
-	"github.com/sariya23/manage_pr_service/tests/factory/teams"
-	"github.com/sariya23/manage_pr_service/tests/factory/users"
+	"github.com/sariya23/manage_pr_service/tests/factory"
 )
 
 type HTTPClient struct {
@@ -29,7 +27,7 @@ func (c *HTTPClient) GetClient() *http.Client {
 	return c.cl
 }
 
-func (c *HTTPClient) TeamsAdd(req teams.AddTeamRequest) *http.Response {
+func (c *HTTPClient) TeamsAdd(req factory.AddTeamRequest) *http.Response {
 	reqJson := req.ToJson()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/team/add", c.port), "application/json", reqJson)
 	if err != nil {
@@ -46,7 +44,7 @@ func (c *HTTPClient) TeamGet(teamName string) *http.Response {
 	return resp
 }
 
-func (c *HTTPClient) UsersSetIsActive(req users.SetIsActiveRequest) *http.Response {
+func (c *HTTPClient) UsersSetIsActive(req factory.SetIsActiveRequest) *http.Response {
 	reqJson := req.ToJson()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/users/setIsActive", c.port), "application/json", reqJson)
 	if err != nil {
@@ -63,7 +61,7 @@ func (c *HTTPClient) UsersGetReview(userID string) *http.Response {
 	return resp
 }
 
-func (c *HTTPClient) PullRequestCreate(req pull_request.PullRequestCreateRequest) *http.Response {
+func (c *HTTPClient) PullRequestCreate(req factory.PullRequestCreateRequest) *http.Response {
 	reqJson := req.ToJson()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/create", c.port), "application/json", reqJson)
 	if err != nil {
@@ -72,7 +70,7 @@ func (c *HTTPClient) PullRequestCreate(req pull_request.PullRequestCreateRequest
 	return resp
 }
 
-func (c *HTTPClient) PullRequestMerge(req pull_request.PullRequestMergeRequest) *http.Response {
+func (c *HTTPClient) PullRequestMerge(req factory.PullRequestMergeRequest) *http.Response {
 	reqJson := req.ToJson()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/merge", c.port), "application/json", reqJson)
 	if err != nil {
@@ -81,7 +79,7 @@ func (c *HTTPClient) PullRequestMerge(req pull_request.PullRequestMergeRequest) 
 	return resp
 }
 
-func (c *HTTPClient) PullRequestReassign(req pull_request.PullRequestReassignRequest) *http.Response {
+func (c *HTTPClient) PullRequestReassign(req factory.PullRequestReassignRequest) *http.Response {
 	reqJson := req.ToJson()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/reassign", c.port), "application/json", reqJson)
 	if err != nil {

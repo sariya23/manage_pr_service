@@ -8,11 +8,11 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
-	checkers_team "github.com/sariya23/manage_pr_service/tests/checkers/team"
+	"github.com/sariya23/manage_pr_service/tests/checkers"
 	httpcleint "github.com/sariya23/manage_pr_service/tests/clients/http"
 	"github.com/sariya23/manage_pr_service/tests/factory"
-	factory_teams "github.com/sariya23/manage_pr_service/tests/factory/teams"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
+	"github.com/sariya23/manage_pr_service/tests/models"
 	"github.com/stretchr/testify/require"
 )
 
@@ -22,20 +22,20 @@ func TestTeamGet(t *testing.T) {
 	ctx := context.Background()
 	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
-	members := []factory_teams.AddTeamRequestMemberDTO{}
+	members := []factory.AddTeamRequestMemberDTO{}
 	for range random.RandInt(1, 3) {
 		isActive := true
-		members = append(members, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members = append(members, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", members)
+	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
 	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
 
 	response := httpClient.TeamGet(requestCreateTeam.TeamName)
-	responseDTO := factory_teams.GetTeamRFromHTTPResponseOK(response)
+	responseDTO := factory.GetTeamRFromHTTPResponseOK(response)
 	teamMembersDB := dbT.GetTeamMembersByTeamName(ctx, requestCreateTeam.TeamName)
-	usersDB := dbT.GetUsersFromDB(ctx, factory.TeamMemberUserIDs(teamMembersDB))
-	checkers_team.CheckGetTeamResponse(t, responseDTO, teamMembersDB, usersDB)
+	usersDB := dbT.GetUsersFromDB(ctx, models.TeamMemberUserIDs(teamMembersDB))
+	checkers.CheckGetTeamResponse(t, responseDTO, teamMembersDB, usersDB)
 }
 
 // TestTeamGet_NonexistentTeam тест на ручку /api/team/get

@@ -8,10 +8,9 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
-	checkers_pull_request "github.com/sariya23/manage_pr_service/tests/checkers/pull_request"
+	"github.com/sariya23/manage_pr_service/tests/checkers"
 	httpcleint "github.com/sariya23/manage_pr_service/tests/clients/http"
-	factory_pull_request "github.com/sariya23/manage_pr_service/tests/factory/pull_request"
-	factory_teams "github.com/sariya23/manage_pr_service/tests/factory/teams"
+	"github.com/sariya23/manage_pr_service/tests/factory"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
 	"github.com/stretchr/testify/require"
 )
@@ -23,33 +22,33 @@ func TestPullRequestMerge(t *testing.T) {
 	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
-	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members = append(members, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members = append(members, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", members)
+	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
 	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
-	requestCreatePR := factory_pull_request.PullRequestCreateRequest{}
+	requestCreatePR := factory.PullRequestCreateRequest{}
 	requestCreatePR.RadnomInit("", "", random.Choice(members).UserID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
 	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
 
-	requestMerge := factory_pull_request.PullRequestMergeRequest{PullRequestID: requestCreatePR.PullRequestID}
+	requestMerge := factory.PullRequestMergeRequest{PullRequestID: requestCreatePR.PullRequestID}
 	responseMerge := httpClient.PullRequestMerge(requestMerge)
 	require.Equal(t, http.StatusOK, responseMerge.StatusCode)
-	responseDTO := factory_pull_request.PullRequestMergeFromHTTPResponseOK(responseMerge)
+	responseDTO := factory.PullRequestMergeFromHTTPResponseOK(responseMerge)
 
 	pullRequestDB := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID)
-	checkers_pull_request.CheckPullRequestMergeResponse(t, responseDTO, *pullRequestDB)
+	checkers.CheckPullRequestMergeResponse(t, responseDTO, *pullRequestDB)
 }
 
 // TestPullRequestMerge тест на ручку /api/pullRequest/merge
 // Ошибка при попытке вмержить несуществующий PR
 func TestPullRequestMerge_NotFound(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
-	requestMerge := factory_pull_request.PullRequestMergeRequest{PullRequestID: gofakeit.LetterN(8)}
+	requestMerge := factory.PullRequestMergeRequest{PullRequestID: gofakeit.LetterN(8)}
 	responseMerge := httpClient.PullRequestMerge(requestMerge)
 	require.Equal(t, http.StatusNotFound, responseMerge.StatusCode)
 }
@@ -58,7 +57,7 @@ func TestPullRequestMerge_NotFound(t *testing.T) {
 // Ошибка при передаче пустого айди
 func TestPullRequestMerge_EmptyPullRequestID(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
-	requestMerge := factory_pull_request.PullRequestMergeRequest{}
+	requestMerge := factory.PullRequestMergeRequest{}
 	responseMerge := httpClient.PullRequestMerge(requestMerge)
 	require.Equal(t, http.StatusBadRequest, responseMerge.StatusCode)
 }

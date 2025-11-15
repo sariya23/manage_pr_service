@@ -12,7 +12,7 @@ import (
 
 	"github.com/sariya23/manage_pr_service/internal/config"
 	"github.com/sariya23/manage_pr_service/internal/storage/database"
-	"github.com/sariya23/manage_pr_service/tests/factory"
+	"github.com/sariya23/manage_pr_service/tests/models"
 )
 
 type TestDB struct {
@@ -52,7 +52,7 @@ func (d *TestDB) Truncate(ctx context.Context, tables ...string) {
 }
 
 // TEAMS
-func (d *TestDB) GetTeamMembersByTeamName(ctx context.Context, teamName string) []factory.TeamMember {
+func (d *TestDB) GetTeamMembersByTeamName(ctx context.Context, teamName string) []models.TeamMember {
 	const operationPlace = "clients.postgresql.NewTestDB"
 	getTeamMembersSQL := `select * from team_member where team_name=$1`
 
@@ -61,10 +61,10 @@ func (d *TestDB) GetTeamMembersByTeamName(ctx context.Context, teamName string) 
 		panic(err.Error() + " " + operationPlace)
 	}
 	defer rows.Close()
-	var teamMembers []factory.TeamMember
+	var teamMembers []models.TeamMember
 
 	for rows.Next() {
-		var teamMember factory.TeamMember
+		var teamMember models.TeamMember
 		err = rows.Scan(
 			&teamMember.TeamName,
 			&teamMember.UserID)
@@ -81,7 +81,7 @@ func (d *TestDB) GetTeamMembersByTeamName(ctx context.Context, teamName string) 
 
 // USER
 
-func (d *TestDB) GetUsersFromDB(ctx context.Context, userIDs []string) []factory.User {
+func (d *TestDB) GetUsersFromDB(ctx context.Context, userIDs []string) []models.User {
 	const operationPlace = "clients.postgresql.GetUsersFromDB"
 
 	getUsersSQL := `select * from "user" where user_id=any($1)`
@@ -91,9 +91,9 @@ func (d *TestDB) GetUsersFromDB(ctx context.Context, userIDs []string) []factory
 		panic(err.Error() + " " + operationPlace)
 	}
 	defer rows.Close()
-	var users []factory.User
+	var users []models.User
 	for rows.Next() {
-		var user factory.User
+		var user models.User
 		err = rows.Scan(
 			&user.UserID,
 			&user.Username,
@@ -112,12 +112,12 @@ func (d *TestDB) GetUsersFromDB(ctx context.Context, userIDs []string) []factory
 }
 
 // PullRequest
-func (d *TestDB) GetPullRequest(ctx context.Context, prID string) *factory.PullRequest {
+func (d *TestDB) GetPullRequest(ctx context.Context, prID string) *models.PullRequest {
 	const operationPlace = "clients.postgresql.GetPullRequest"
 
 	getPullRequestSQL := `select * from pull_request where pull_request_id=$1`
 	row := d.DB.GetPool().QueryRow(ctx, getPullRequestSQL, prID)
-	var prDB factory.PullRequestDB
+	var prDB models.PullRequestDB
 	err := row.Scan(
 		&prDB.ID,
 		&prDB.Name,
@@ -132,7 +132,7 @@ func (d *TestDB) GetPullRequest(ctx context.Context, prID string) *factory.PullR
 	return prDB.ToDomain()
 }
 
-func (d *TestDB) GetReviewerPullRequests(ctx context.Context, reviewerID string) []factory.PullRequest {
+func (d *TestDB) GetReviewerPullRequests(ctx context.Context, reviewerID string) []models.PullRequest {
 	const operationPlace = "clients.postgresql.GetReviewerPullRequests"
 
 	getReviewerPullRequestsSQL := `select * from pull_request where $1=any(assigned_reviewers)`
@@ -142,9 +142,9 @@ func (d *TestDB) GetReviewerPullRequests(ctx context.Context, reviewerID string)
 		panic(err.Error() + " " + operationPlace)
 	}
 	defer rows.Close()
-	var pullRequests []factory.PullRequest
+	var pullRequests []models.PullRequest
 	for rows.Next() {
-		var pullRequestDB factory.PullRequestDB
+		var pullRequestDB models.PullRequestDB
 		err = rows.Scan(
 			&pullRequestDB.ID,
 			&pullRequestDB.Name,

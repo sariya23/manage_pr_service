@@ -1,6 +1,6 @@
 //go:build integrations
 
-package teams
+package factory
 
 import (
 	"encoding/json"

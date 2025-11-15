@@ -9,14 +9,12 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
-	checkers_pull_request "github.com/sariya23/manage_pr_service/tests/checkers/pull_request"
+	"github.com/sariya23/manage_pr_service/tests/checkers"
 	httpcleint "github.com/sariya23/manage_pr_service/tests/clients/http"
 	"github.com/sariya23/manage_pr_service/tests/factory"
-	factory_pull_request "github.com/sariya23/manage_pr_service/tests/factory/pull_request"
-	factory_teams "github.com/sariya23/manage_pr_service/tests/factory/teams"
-	users_factory "github.com/sariya23/manage_pr_service/tests/factory/users"
 	"github.com/sariya23/manage_pr_service/tests/helpers"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
+	"github.com/sariya23/manage_pr_service/tests/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -28,39 +26,39 @@ func TestPullRequestReassign(t *testing.T) {
 	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(3, 6)
-	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members = append(members, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members = append(members, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", members)
+	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
 	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
-	requestCreatePR := factory_pull_request.PullRequestCreateRequest{}
+	requestCreatePR := factory.PullRequestCreateRequest{}
 	authorID := random.Choice(members).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
 	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
 
 	prReviewers := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID).AssignedReviewerIDs
-	requestReassign := factory_pull_request.PullRequestReassignRequest{
+	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
 		OldUserID:     random.Choice(helpers.Filter(prReviewers, authorID)),
 	}
 	responseReassign := httpClient.PullRequestReassign(requestReassign)
 	require.Equal(t, http.StatusOK, responseReassign.StatusCode)
-	responseDTO := factory_pull_request.PullRequestReassignFromHTTPResponseOK(responseReassign)
+	responseDTO := factory.PullRequestReassignFromHTTPResponseOK(responseReassign)
 	prDB := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID)
 
 	assert.False(t, slices.Contains(prDB.AssignedReviewerIDs, authorID))
-	checkers_pull_request.CheckPullRequestReassignResponse(t, responseDTO, *prDB)
+	checkers.CheckPullRequestReassignResponse(t, responseDTO, *prDB)
 }
 
 // TestPullRequestReassign_NonexistentPullRequest тест ручки /api/pullRequest/reassign
 // Несуществующий PR
 func TestPullRequestReassign_NonexistentPullRequest(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
-	requestReassign := factory_pull_request.PullRequestReassignRequest{
+	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: gofakeit.LetterN(8),
 		OldUserID:     gofakeit.LetterN(8),
 	}
@@ -75,23 +73,23 @@ func TestPullRequestReassign_PullRequestMerged(t *testing.T) {
 	ctx := context.Background()
 	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(1, 3)
-	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members = append(members, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members = append(members, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", members)
+	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
 	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
-	requestCreatePR := factory_pull_request.PullRequestCreateRequest{}
+	requestCreatePR := factory.PullRequestCreateRequest{}
 	requestCreatePR.RadnomInit("", "", random.Choice(members).UserID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
 	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
-	requestMerge := factory_pull_request.PullRequestMergeRequest{PullRequestID: requestCreatePR.PullRequestID}
+	requestMerge := factory.PullRequestMergeRequest{PullRequestID: requestCreatePR.PullRequestID}
 	responseMerge := httpClient.PullRequestMerge(requestMerge)
 	require.Equal(t, http.StatusOK, responseMerge.StatusCode)
 
-	requestReassign := factory_pull_request.PullRequestReassignRequest{
+	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
 		OldUserID:     gofakeit.LetterN(8),
 	}
@@ -106,21 +104,21 @@ func TestPullRequestReassign_NonexistentOldUserID(t *testing.T) {
 	ctx := context.Background()
 	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(4, 6)
-	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members = append(members, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members = append(members, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", members)
+	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
 	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
-	requestCreatePR := factory_pull_request.PullRequestCreateRequest{}
+	requestCreatePR := factory.PullRequestCreateRequest{}
 	authorID := random.Choice(members).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
 	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
 
-	requestReassign := factory_pull_request.PullRequestReassignRequest{
+	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
 		OldUserID:     gofakeit.LetterN(8),
 	}
@@ -135,21 +133,21 @@ func TestPullRequestReassign_OldUserIsAuthor(t *testing.T) {
 	ctx := context.Background()
 	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(4, 6)
-	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members = append(members, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members = append(members, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", members)
+	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
 	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
-	requestCreatePR := factory_pull_request.PullRequestCreateRequest{}
+	requestCreatePR := factory.PullRequestCreateRequest{}
 	authorID := random.Choice(members).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
 	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
 
-	requestReassign := factory_pull_request.PullRequestReassignRequest{
+	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
 		OldUserID:     requestCreatePR.AuthorID,
 	}
@@ -164,30 +162,30 @@ func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
 	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
-	members1 := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members1 := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members1 = append(members1, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members1 = append(members1, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam1 := factory_teams.RandomInitAddTeamRequest("", members1)
+	requestCreateTeam1 := factory.RandomInitAddTeamRequest("", members1)
 	responseCreateTeam1 := httpClient.TeamsAdd(requestCreateTeam1)
 	require.Equal(t, http.StatusOK, responseCreateTeam1.StatusCode)
-	members2 := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members2 := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members2 = append(members2, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members2 = append(members2, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam2 := factory_teams.RandomInitAddTeamRequest("", members2)
+	requestCreateTeam2 := factory.RandomInitAddTeamRequest("", members2)
 	responseCreateTeam2 := httpClient.TeamsAdd(requestCreateTeam2)
 	require.Equal(t, http.StatusOK, responseCreateTeam2.StatusCode)
 
-	requestCreatePR := factory_pull_request.PullRequestCreateRequest{}
+	requestCreatePR := factory.PullRequestCreateRequest{}
 	authorID := random.Choice(members1).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
 	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
 
-	requestReassign := factory_pull_request.PullRequestReassignRequest{
+	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
 		OldUserID:     random.Choice(members2).UserID,
 	}
@@ -202,15 +200,15 @@ func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
-	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members = append(members, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members = append(members, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", members)
+	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
 	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
-	requestCreatePR := factory_pull_request.PullRequestCreateRequest{}
+	requestCreatePR := factory.PullRequestCreateRequest{}
 	authorID := random.Choice(members).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
@@ -218,8 +216,8 @@ func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 
 	teamDB := dbT.GetTeamMembersByTeamName(ctx, requestCreateTeam.TeamName)
 	prDB := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID)
-	membersWithoutAuthor := helpers.Filter(factory.TeamMemberUserIDs(teamDB), requestCreatePR.AuthorID)
-	requestReassign := factory_pull_request.PullRequestReassignRequest{
+	membersWithoutAuthor := helpers.Filter(models.TeamMemberUserIDs(teamDB), requestCreatePR.AuthorID)
+	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
 		OldUserID:     random.Choice(helpers.Filters(membersWithoutAuthor, prDB.AssignedReviewerIDs)),
 	}
@@ -234,30 +232,30 @@ func TestPullRequestReassign_NoReviewerCandidates(t *testing.T) {
 	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := 2
-	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
+	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
-		members = append(members, factory_teams.RandomInitAddTeamRequestMemberDT("", "", &isActive))
+		members = append(members, factory.RandomInitAddTeamRequestMemberDT("", "", &isActive))
 	}
-	requestCreateTeam := factory_teams.RandomInitAddTeamRequest("", members)
+	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
 	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
-	requestCreatePR := factory_pull_request.PullRequestCreateRequest{}
+	requestCreatePR := factory.PullRequestCreateRequest{}
 	authorID := random.Choice(members).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
 	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
 
 	teamDB := dbT.GetTeamMembersByTeamName(ctx, requestCreateTeam.TeamName)
-	inActiveUser := random.Choice(helpers.Filter(factory.TeamMemberUserIDs(teamDB), authorID))
-	requestSetIsActive := users_factory.SetIsActiveRequest{
+	inActiveUser := random.Choice(helpers.Filter(models.TeamMemberUserIDs(teamDB), authorID))
+	requestSetIsActive := factory.SetIsActiveRequest{
 		UserID:   inActiveUser,
 		IsActive: false,
 	}
 	responseSetIsActive := httpClient.UsersSetIsActive(requestSetIsActive)
 	require.Equal(t, http.StatusOK, responseSetIsActive.StatusCode)
 
-	requestReassign := factory_pull_request.PullRequestReassignRequest{
+	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
 		OldUserID:     inActiveUser,
 	}
@@ -270,15 +268,15 @@ func TestPullRequestReassign_NoReviewerCandidates(t *testing.T) {
 func TestPullRequestReassign_ValidationError(t *testing.T) {
 	cases := []struct {
 		name    string
-		request factory_pull_request.PullRequestReassignRequest
+		request factory.PullRequestReassignRequest
 	}{
 		{
 			name:    "no pr id",
-			request: factory_pull_request.PullRequestReassignRequest{OldUserID: "zxc"},
+			request: factory.PullRequestReassignRequest{OldUserID: "zxc"},
 		},
 		{
 			name:    "no user id",
-			request: factory_pull_request.PullRequestReassignRequest{PullRequestID: "zxc"},
+			request: factory.PullRequestReassignRequest{PullRequestID: "zxc"},
 		},
 	}
 	for _, c := range cases {

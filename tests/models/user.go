@@ -1,6 +1,6 @@
 //go:build integrations
 
-package factory
+package models
 
 import (
 	"sort"

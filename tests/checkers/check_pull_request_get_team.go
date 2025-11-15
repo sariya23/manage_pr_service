@@ -1,20 +1,20 @@
 //go:build integrations
 
-package checkers_team
+package checkers
 
 import (
 	"testing"
 
 	"github.com/sariya23/manage_pr_service/tests/factory"
-	factory_teams "github.com/sariya23/manage_pr_service/tests/factory/teams"
+	"github.com/sariya23/manage_pr_service/tests/models"
 	"github.com/stretchr/testify/assert"
 )
 
-func CheckGetTeamResponse(t *testing.T, responseDTO factory_teams.GetTeamResponse, teamMembersDB []factory.TeamMember,
-	usersDB []factory.User) {
-	factory.TeamMemberSortByUserID(teamMembersDB)
-	factory.UserSortByUserID(usersDB)
-	factory_teams.GetTeamResponseMemberSortByUserID(responseDTO.Members)
+func CheckGetTeamResponse(t *testing.T, responseDTO factory.GetTeamResponse, teamMembersDB []models.TeamMember,
+	usersDB []models.User) {
+	models.TeamMemberSortByUserID(teamMembersDB)
+	models.UserSortByUserID(usersDB)
+	factory.GetTeamResponseMemberSortByUserID(responseDTO.Members)
 	assert.Equal(t, len(teamMembersDB), len(responseDTO.Members))
 	for i := 0; i < len(teamMembersDB); i++ {
 		assert.Equal(t, teamMembersDB[i].TeamName, responseDTO.TeamName)

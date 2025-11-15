@@ -1,6 +1,6 @@
 //go:build integrations
 
-package pull_request
+package factory
 
 import (
 	"bytes"
