@@ -28,7 +28,7 @@ services:
     depends_on:
       pg_manage_db:
         condition: service_healthy
-    command: sh -c "until pg_isready -h ${POSTGRES_HOST_INNER} -p ${POSTGRES_PORT}; do sleep 1; done; make service_migrate_inner ENV=local"
+    command: sh -c "until pg_isready -h ${POSTGRES_HOST_INNER} -p ${POSTGRES_PORT}; do sleep 1; done; make test_migrate ENV=test"
 
 
   pg_manage_app:

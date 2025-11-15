@@ -3,11 +3,13 @@
 package httpcleint
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"time"
 
 	"github.com/sariya23/manage_pr_service/internal/config"
+	"github.com/sariya23/manage_pr_service/tests/factory/teams"
 )
 
 type HTTPClient struct {
@@ -23,4 +25,13 @@ func NewHTTPClient() *HTTPClient {
 
 func (c *HTTPClient) GetClient() *http.Client {
 	return c.cl
+}
+
+func (c *HTTPClient) TeamsAdd(req teams.AddTeamRequest) *http.Response {
+	reqJson := req.ToJson()
+	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/team/add", c.port), "application/json", reqJson)
+	if err != nil {
+		panic(err)
+	}
+	return resp
 }

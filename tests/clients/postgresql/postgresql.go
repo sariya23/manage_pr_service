@@ -12,6 +12,7 @@ import (
 
 	"github.com/sariya23/manage_pr_service/internal/config"
 	"github.com/sariya23/manage_pr_service/internal/storage/database"
+	"github.com/sariya23/manage_pr_service/tests/factory"
 )
 
 type TestDB struct {
@@ -19,6 +20,7 @@ type TestDB struct {
 }
 
 func NewTestDB() *TestDB {
+	const operationPlace = "clients.postgresql.NewTestDB"
 	cfg := config.MustLoadByPath(filepath.Join("..", "..", "..", "..", "config", "test.env"))
 	DB, err := database.NewConnection(
 		context.Background(),
@@ -32,7 +34,7 @@ func NewTestDB() *TestDB {
 		),
 	)
 	if err != nil {
-		panic(err)
+		panic(err.Error() + " " + operationPlace)
 	}
 	return &TestDB{DB: DB}
 }
@@ -51,4 +53,32 @@ func (d *TestDB) Truncate(ctx context.Context, tables ...string) {
 	if _, err := d.DB.GetPool().Exec(ctx, q); err != nil {
 		panic(err)
 	}
+}
+
+// TEAMS
+func (d *TestDB) GetTeamMembersByTeamName(ctx context.Context, teamName string) []factory.TeamMember {
+	const operationPlace = "clients.postgresql.NewTestDB"
+	getTeamMembersSQL := `select * from team_member where team_name=$1`
+
+	rows, err := d.DB.GetPool().Query(ctx, getTeamMembersSQL, teamName)
+	if err != nil {
+		panic(err.Error() + " " + operationPlace)
+	}
+	defer rows.Close()
+	var teamMembers []factory.TeamMember
+
+	for rows.Next() {
+		var teamMember factory.TeamMember
+		err = rows.Scan(
+			&teamMember.TeamName,
+			&teamMember.UserID)
+		if err != nil {
+			panic(err.Error() + " " + operationPlace)
+		}
+		if rows.Err() != nil {
+			panic(rows.Err().Error() + " " + operationPlace)
+		}
+		teamMembers = append(teamMembers, teamMember)
+	}
+	return teamMembers
 }
