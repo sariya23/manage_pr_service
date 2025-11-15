@@ -20,6 +20,7 @@ import (
 // УСпешный merge
 func TestPullRequestMerge(t *testing.T) {
 	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)

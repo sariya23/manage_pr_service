@@ -39,6 +39,7 @@ func TestAddTeam_NewTeamNewUsers(t *testing.T) {
 // Добавление новых юзеров в существующую команду
 func TestAddTeam_AddUsersToTeam(t *testing.T) {
 	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	// Предварительно создаем команду с юзерами
 	nUsers := random.RandInt(1, 3)
@@ -70,6 +71,8 @@ func TestAddTeam_AddUsersToTeam(t *testing.T) {
 // TestAddTeam_InActiveUsers тест ручки /api/team/add
 // Если хотя бы один пользователь неактивен, то возвращается ошибка
 func TestAddTeam_InActiveUsers(t *testing.T) {
+	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	membersInit := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
@@ -87,7 +90,8 @@ func TestAddTeam_InActiveUsers(t *testing.T) {
 // // TestAddTeam_InActiveUsers тест ручки /api/team/add
 // // При попытке добавить пользователя из другой команды возвращается ошибка
 func TestAddTeam_UserFromAnotherTeam(t *testing.T) {
-	//ctx := context.Background()
+	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	membersInit := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)

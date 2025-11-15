@@ -39,8 +39,9 @@ func NewTestDB() *TestDB {
 	return &TestDB{DB: DB}
 }
 
-func (d *TestDB) TearDown(t *testing.T) {
+func (d *TestDB) SetUp(ctx context.Context, t *testing.T, tablenames ...string) {
 	t.Helper()
+	d.Truncate(ctx, tablenames...)
 }
 
 func (d *TestDB) Truncate(ctx context.Context, tables ...string) {
@@ -129,4 +130,36 @@ func (d *TestDB) GetPullRequest(ctx context.Context, prID string) *factory.PullR
 		panic(err.Error() + " " + operationPlace)
 	}
 	return prDB.ToDomain()
+}
+
+func (d *TestDB) GetReviewerPullRequests(ctx context.Context, reviewerID string) []factory.PullRequest {
+	const operationPlace = "clients.postgresql.GetReviewerPullRequests"
+
+	getReviewerPullRequestsSQL := `select * from pull_request where $1=any(assigned_reviewers)`
+
+	rows, err := d.DB.GetPool().Query(ctx, getReviewerPullRequestsSQL, reviewerID)
+	if err != nil {
+		panic(err.Error() + " " + operationPlace)
+	}
+	defer rows.Close()
+	var pullRequests []factory.PullRequest
+	for rows.Next() {
+		var pullRequestDB factory.PullRequestDB
+		err = rows.Scan(
+			&pullRequestDB.ID,
+			&pullRequestDB.Name,
+			&pullRequestDB.AuthorID,
+			&pullRequestDB.Status,
+			&pullRequestDB.MergedAt,
+			&pullRequestDB.CreatedAt,
+			&pullRequestDB.AssignedReviewerIDs)
+		if err != nil {
+			panic(err.Error() + " " + operationPlace)
+		}
+		if rows.Err() != nil {
+			panic(rows.Err().Error() + " " + operationPlace)
+		}
+		pullRequests = append(pullRequests, *pullRequestDB.ToDomain())
+	}
+	return pullRequests
 }

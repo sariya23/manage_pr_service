@@ -7,9 +7,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"slices"
-
-	"github.com/sariya23/manage_pr_service/tests/helpers/random"
 )
 
 type PullRequestReassignRequest struct {
@@ -53,25 +50,4 @@ func PullRequestReassignFromHTTPResponseOK(resp *http.Response) PullRequestReass
 		panic(err.Error() + " " + operationPlace)
 	}
 	return result
-}
-
-func MembersWithoutAuthorID(members []string, authorID string) []string {
-	withoutAuthor := make([]string, 0, len(members)-1)
-
-	for _, member := range members {
-		if member != authorID {
-			withoutAuthor = append(withoutAuthor, member)
-		}
-	}
-	return withoutAuthor
-}
-
-func PickTeamUserButNotReviewer(members []string, reviewers []string) string {
-	withoutReviewer := make([]string, 0, len(members)-len(reviewers))
-	for _, member := range members {
-		if !slices.Contains(reviewers, member) {
-			withoutReviewer = append(withoutReviewer, member)
-		}
-	}
-	return random.Choice(withoutReviewer)
 }

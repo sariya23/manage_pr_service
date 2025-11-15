@@ -20,6 +20,7 @@ import (
 // Возвращаются участники команды
 func TestTeamGet(t *testing.T) {
 	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	members := []factory_teams.AddTeamRequestMemberDTO{}
 	for range random.RandInt(1, 3) {

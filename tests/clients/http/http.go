@@ -55,6 +55,14 @@ func (c *HTTPClient) UsersSetIsActive(req users.SetIsActiveRequest) *http.Respon
 	return resp
 }
 
+func (c *HTTPClient) UsersGetReview(userID string) *http.Response {
+	resp, err := c.cl.Get(fmt.Sprintf("http://localhost:%d/api/users/getReview/%s", c.port, userID))
+	if err != nil {
+		panic(err)
+	}
+	return resp
+}
+
 func (c *HTTPClient) PullRequestCreate(req pull_request.PullRequestCreateRequest) *http.Response {
 	reqJson := req.ToJson()
 	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/api/pullRequest/create", c.port), "application/json", reqJson)

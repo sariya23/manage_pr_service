@@ -25,6 +25,7 @@ import (
 // Успешный reassign
 func TestPullRequestReassign(t *testing.T) {
 	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(3, 6)
 	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
@@ -44,7 +45,7 @@ func TestPullRequestReassign(t *testing.T) {
 	prReviewers := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID).AssignedReviewerIDs
 	requestReassign := factory_pull_request.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
-		OldUserID:     random.Choice(factory_pull_request.MembersWithoutAuthorID(prReviewers, authorID)),
+		OldUserID:     random.Choice(helpers.Filter(prReviewers, authorID)),
 	}
 	responseReassign := httpClient.PullRequestReassign(requestReassign)
 	require.Equal(t, http.StatusOK, responseReassign.StatusCode)
@@ -71,6 +72,8 @@ func TestPullRequestReassign_NonexistentPullRequest(t *testing.T) {
 // Нельзя изменить вмерженный PR
 func TestPullRequestReassign_PullRequestMerged(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
+	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -100,6 +103,8 @@ func TestPullRequestReassign_PullRequestMerged(t *testing.T) {
 // Несуществующий переназначаемый пользователь
 func TestPullRequestReassign_NonexistentOldUserID(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
+	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -127,6 +132,8 @@ func TestPullRequestReassign_NonexistentOldUserID(t *testing.T) {
 // Переназначаемый юзер - это автор PR
 func TestPullRequestReassign_OldUserIsAuthor(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
+	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -153,6 +160,8 @@ func TestPullRequestReassign_OldUserIsAuthor(t *testing.T) {
 // TestPullRequestReassign_OldUserInAnotherTeam тест ручки /api/pullRequest/reassign
 // Переназначаемый юзер не принадлежит команде ПРа
 func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
+	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
 	members1 := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
@@ -190,6 +199,7 @@ func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
 // Переназначаемый юзер не в ревьюверах ПРа
 func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
@@ -208,10 +218,10 @@ func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 
 	teamDB := dbT.GetTeamMembersByTeamName(ctx, requestCreateTeam.TeamName)
 	prDB := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID)
-	membersWithoutAuthor := factory_pull_request.MembersWithoutAuthorID(factory.TeamMemberUserIDs(teamDB), requestCreatePR.AuthorID)
+	membersWithoutAuthor := helpers.Filter(factory.TeamMemberUserIDs(teamDB), requestCreatePR.AuthorID)
 	requestReassign := factory_pull_request.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
-		OldUserID:     factory_pull_request.PickTeamUserButNotReviewer(membersWithoutAuthor, prDB.AssignedReviewerIDs),
+		OldUserID:     random.Choice(helpers.Filters(membersWithoutAuthor, prDB.AssignedReviewerIDs)),
 	}
 	response := httpClient.PullRequestReassign(requestReassign)
 	require.Equal(t, http.StatusConflict, response.StatusCode)
@@ -221,6 +231,7 @@ func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 // Нет кандидатов на переназначение
 func TestPullRequestReassign_NoReviewerCandidates(t *testing.T) {
 	ctx := context.Background()
+	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := 2
 	members := make([]factory_teams.AddTeamRequestMemberDTO, 0, nUsers)
