@@ -110,3 +110,13 @@ func TestAddTeam_UserFromAnotherTeam(t *testing.T) {
 	response := httpClient.TeamsAdd(request)
 	require.Equal(t, http.StatusBadRequest, response.StatusCode)
 }
+
+// TestAddTeam_EmptyTeamName тест ручки /api/team/add
+// В запросе не передано название команды
+func TestAddTeam_EmptyTeamName(t *testing.T) {
+	httpClient := httpcleint.NewHTTPClient()
+	request := factory_teams.RandomInitAddTeamRequest("", nil)
+	request.TeamName = ""
+	response := httpClient.TeamsAdd(request)
+	require.Equal(t, http.StatusBadRequest, response.StatusCode)
+}
