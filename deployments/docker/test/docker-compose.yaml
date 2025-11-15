@@ -1,6 +1,6 @@
 
 services:
-  pg_manage_db:
+  pr_manage_db:
     image: postgres:16
     restart: "always"
     environment:
@@ -15,7 +15,7 @@ services:
       timeout: 5s
       retries: 5
 
-  pg_manage_migrations:
+  pr_manage_migrations:
     build:
       dockerfile: deployments/docker/local/Dockerfile
       context: ../../..
@@ -26,12 +26,12 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_PORT: ${POSTGRES_PORT}
     depends_on:
-      pg_manage_db:
+      pr_manage_db:
         condition: service_healthy
     command: sh -c "until pg_isready -h ${POSTGRES_HOST_INNER} -p ${POSTGRES_PORT}; do sleep 1; done; make test_migrate ENV=test"
 
 
-  pg_manage_app:
+  pr_manage_app:
     build:
       dockerfile: deployments/docker/local/Dockerfile
       context: ../../..
@@ -40,6 +40,6 @@ services:
     ports:
       - "${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT}"
     depends_on:
-      pg_manage_db:
+      pr_manage_db:
         condition: service_healthy
     command: ./service --config=${CONFIG_PATH}
