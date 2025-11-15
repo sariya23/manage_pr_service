@@ -25,6 +25,9 @@ migrate:
 	@$(POSTGRES_HOST_OUTER):$(POSTGRES_PORT)/$(POSTGRES_DB)\
 	?sslmode=$(SSL_MODE)" up
 
+.PHONU: lint
+lint:
+	revive ./...
 
 # LOCAL
 .PHONY: service_up
