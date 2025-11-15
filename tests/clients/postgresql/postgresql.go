@@ -82,3 +82,35 @@ func (d *TestDB) GetTeamMembersByTeamName(ctx context.Context, teamName string) 
 	}
 	return teamMembers
 }
+
+// USER
+
+func (d *TestDB) GetUsersFromDB(ctx context.Context, userIDs []string) []factory.User {
+	const operationPlace = "clients.postgresql.GetUsersFromDB"
+
+	getUsersSQL := `select * from "user" where user_id=any($1)`
+
+	rows, err := d.DB.GetPool().Query(ctx, getUsersSQL, userIDs)
+	if err != nil {
+		panic(err.Error() + " " + operationPlace)
+	}
+	defer rows.Close()
+	var users []factory.User
+	for rows.Next() {
+		var user factory.User
+		err = rows.Scan(
+			&user.UserID,
+			&user.Username,
+			&user.IsActive,
+			&user.CreatedAt,
+			&user.UpdatedAt)
+		if err != nil {
+			panic(err.Error() + " " + operationPlace)
+		}
+		if rows.Err() != nil {
+			panic(rows.Err().Error() + " " + operationPlace)
+		}
+		users = append(users, user)
+	}
+	return users
+}
