@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestAddTeam_NewTeamNewUsers тест ручки /api/team/add
+// TestAddTeam_NewTeamNewUsers тест ручки /team/add
 // Создание новой команды и новых юзеров
 func TestAddTeam_NewTeamNewUsers(t *testing.T) {
 	ctx := context.Background()
@@ -35,11 +35,10 @@ func TestAddTeam_NewTeamNewUsers(t *testing.T) {
 	checkers.CheckAddTeamResponse(t, responseDTO, teamMembersDB, usersDB)
 }
 
-// TestAddTeam_AddUsersToTeam тест ручки /api/team/add
+// TestAddTeam_AddUsersToTeam тест ручки /team/add
 // Добавление новых юзеров в существующую команду
 func TestAddTeam_AddUsersToTeam(t *testing.T) {
 	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	// Предварительно создаем команду с юзерами
 	nUsers := random.RandInt(1, 3)
@@ -50,7 +49,7 @@ func TestAddTeam_AddUsersToTeam(t *testing.T) {
 	}
 	requestCreateTeam := factory.RandomInitAddTeamRequest("", membersInit)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
-	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode, responseCreateTeam.Header.Get("requestID"))
 
 	nUsers = random.RandInt(1, 3)
 	newMembers := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -68,11 +67,9 @@ func TestAddTeam_AddUsersToTeam(t *testing.T) {
 	checkers.CheckAddTeamResponse(t, responseDTO, teamMembersDB, usersDB)
 }
 
-// TestAddTeam_InActiveUsers тест ручки /api/team/add
+// TestAddTeam_InActiveUsers тест ручки /team/add
 // Если хотя бы один пользователь неактивен, то возвращается ошибка
 func TestAddTeam_InActiveUsers(t *testing.T) {
-	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	membersInit := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -87,11 +84,9 @@ func TestAddTeam_InActiveUsers(t *testing.T) {
 	require.Equal(t, http.StatusBadRequest, response.StatusCode)
 }
 
-// // TestAddTeam_InActiveUsers тест ручки /api/team/add
+// // TestAddTeam_InActiveUsers тест ручки /team/add
 // // При попытке добавить пользователя из другой команды возвращается ошибка
 func TestAddTeam_UserFromAnotherTeam(t *testing.T) {
-	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	membersInit := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -101,7 +96,7 @@ func TestAddTeam_UserFromAnotherTeam(t *testing.T) {
 	}
 	requestCreateTeam := factory.RandomInitAddTeamRequest("", membersInit)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
-	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode, responseCreateTeam.Header.Get("requestID"))
 	user := random.Choice(membersInit)
 	nUsers = random.RandInt(1, 3)
 	membersAdd := make([]factory.AddTeamRequestMemberDTO, 0, nUsers+1)
@@ -115,7 +110,7 @@ func TestAddTeam_UserFromAnotherTeam(t *testing.T) {
 	require.Equal(t, http.StatusBadRequest, response.StatusCode)
 }
 
-// TestAddTeam_EmptyTeamName тест ручки /api/team/add
+// TestAddTeam_EmptyTeamName тест ручки /team/add
 // В запросе не передано название команды
 func TestAddTeam_EmptyTeamName(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()

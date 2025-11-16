@@ -19,10 +19,10 @@ type AddTeamRequestMemberDTO struct {
 
 func RandomInitAddTeamRequestMemberDT(userID string, username string, isActive *bool) AddTeamRequestMemberDTO {
 	if userID == "" {
-		userID = gofakeit.LetterN(uint(random.RandInt(1, 8)))
+		userID = gofakeit.LetterN(32)
 	}
 	if username == "" {
-		username = gofakeit.LetterN(25)
+		username = gofakeit.LetterN(32)
 	}
 	var active bool
 	if isActive == nil {
@@ -54,7 +54,7 @@ func (r *AddTeamRequest) ToJSON() io.Reader {
 
 func RandomInitAddTeamRequest(teamName string, members []AddTeamRequestMemberDTO) AddTeamRequest {
 	if teamName == "" {
-		teamName = gofakeit.LetterN(8)
+		teamName = gofakeit.LetterN(32)
 	}
 	membersN := random.RandInt(1, 3)
 	resMembers := make([]AddTeamRequestMemberDTO, 0, membersN)

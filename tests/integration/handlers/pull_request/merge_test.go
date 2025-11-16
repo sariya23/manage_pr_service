@@ -15,11 +15,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestPullRequestMerge тест на ручку /api/pullRequest/merge
+// TestPullRequestMerge тест на ручку /pullRequest/merge
 // УСпешный merge
 func TestPullRequestMerge(t *testing.T) {
 	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -44,16 +43,16 @@ func TestPullRequestMerge(t *testing.T) {
 	checkers.CheckPullRequestMergeResponse(t, responseDTO, *pullRequestDB)
 }
 
-// TestPullRequestMerge тест на ручку /api/pullRequest/merge
+// TestPullRequestMerge тест на ручку /pullRequest/merge
 // Ошибка при попытке вмержить несуществующий PR
 func TestPullRequestMerge_NotFound(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
-	requestMerge := factory.PullRequestMergeRequest{PullRequestID: gofakeit.LetterN(8)}
+	requestMerge := factory.PullRequestMergeRequest{PullRequestID: gofakeit.LetterN(32)}
 	responseMerge := httpClient.PullRequestMerge(requestMerge)
 	require.Equal(t, http.StatusNotFound, responseMerge.StatusCode)
 }
 
-// TestPullRequestMerge_EmptyPullRequestID тест на ручку /api/pullRequest/merge
+// TestPullRequestMerge_EmptyPullRequestID тест на ручку /pullRequest/merge
 // Ошибка при передаче пустого айди
 func TestPullRequestMerge_EmptyPullRequestID(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log/slog"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/render"
 	"github.com/sariya23/manage_pr_service/internal/converters"
@@ -11,6 +12,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/lib/errorhandler"
 	"github.com/sariya23/manage_pr_service/internal/lib/request"
+	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	teamsvalidators "github.com/sariya23/manage_pr_service/internal/validators"
 )
 
@@ -48,6 +50,7 @@ func (i TeamsImplementation) PostTeamAdd(w http.ResponseWriter, r *http.Request)
 		render.JSON(w, r, resp)
 		return
 	}
+	log.Info("team created", slog.String("team_name", rq.TeamName), slog.String("members", strings.Join(domain.UserIDs(members), ",")))
 	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, api.PostTeamAdd201JSONResponse{Team: &api.Team{
 		Members:  converters.MultiDomainUserToAddTeamResponse(members),

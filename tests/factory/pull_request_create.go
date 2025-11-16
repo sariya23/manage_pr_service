@@ -17,7 +17,7 @@ type PullRequestCreateRequest struct {
 
 func (pr *PullRequestCreateRequest) RadnomInit(prID string, prName string, authorID string) {
 	if prID == "" {
-		prID = gofakeit.LetterN(8)
+		prID = gofakeit.LetterN(32)
 	}
 
 	if prName == "" {
@@ -25,7 +25,7 @@ func (pr *PullRequestCreateRequest) RadnomInit(prID string, prName string, autho
 	}
 
 	if authorID == "" {
-		authorID = gofakeit.LetterN(8)
+		authorID = gofakeit.LetterN(32)
 	}
 
 	pr.PullRequestID = prID

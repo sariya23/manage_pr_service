@@ -16,11 +16,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestPullRequestCreate тест ручки /api/pullRequest/create
+// TestPullRequestCreate тест ручки /pullRequest/create
 // Успешное создание PullRequest
 func TestPullRequestCreate(t *testing.T) {
 	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -47,7 +46,7 @@ func TestPullRequestCreate(t *testing.T) {
 	checkers.CheckPullRequestCreateResponse(t, responseDTO, *pullRequestDB)
 }
 
-// TestPullRequestCreate_AuthorNotFound тест ручки /api/pullRequest/create
+// TestPullRequestCreate_AuthorNotFound тест ручки /pullRequest/create
 // При попытке создать PR несуществующим пользователем, вернется ошибка
 func TestPullRequestCreate_AuthorNotFound(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
@@ -57,7 +56,7 @@ func TestPullRequestCreate_AuthorNotFound(t *testing.T) {
 	require.Equal(t, http.StatusNotFound, response.StatusCode)
 }
 
-// TestPullRequestCreate_AlreadyExists тест ручки /api/pullRequest/create
+// TestPullRequestCreate_AlreadyExists тест ручки /pullRequest/create
 // При попытке создать PR с уже существующим айдишником, вернется ошибка
 func TestPullRequestCreate_AlreadyExists(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
@@ -80,7 +79,7 @@ func TestPullRequestCreate_AlreadyExists(t *testing.T) {
 	require.Equal(t, http.StatusConflict, responseAlreadyExists.StatusCode)
 }
 
-// TestPullRequestCreate_ValidationError тест ручки /api/pullRequest/create
+// TestPullRequestCreate_ValidationError тест ручки /pullRequest/create
 // Ошибки валидации
 func TestPullRequestCreate_ValidationError(t *testing.T) {
 	cases := []struct {
@@ -90,20 +89,20 @@ func TestPullRequestCreate_ValidationError(t *testing.T) {
 		{
 			name: "empty pull request id",
 			request: factory.PullRequestCreateRequest{
-				PullRequestName: gofakeit.LetterN(8),
-				AuthorID:        gofakeit.LetterN(8)},
+				PullRequestName: gofakeit.LetterN(32),
+				AuthorID:        gofakeit.LetterN(32)},
 		},
 		{
 			name: "empty author id",
 			request: factory.PullRequestCreateRequest{
-				PullRequestName: gofakeit.LetterN(8),
-				PullRequestID:   gofakeit.LetterN(8)},
+				PullRequestName: gofakeit.LetterN(32),
+				PullRequestID:   gofakeit.LetterN(32)},
 		},
 		{
 			name: "empty pull request name",
 			request: factory.PullRequestCreateRequest{
-				AuthorID:      gofakeit.LetterN(8),
-				PullRequestID: gofakeit.LetterN(8)},
+				AuthorID:      gofakeit.LetterN(32),
+				PullRequestID: gofakeit.LetterN(32)},
 		},
 	}
 	httpClient := httpcleint.NewHTTPClient()

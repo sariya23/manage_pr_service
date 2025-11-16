@@ -49,6 +49,7 @@ func (i PullRequestImplementation) PostPullRequestCreate(w http.ResponseWriter, 
 		render.JSON(w, r, resp)
 		return
 	}
+	log.Info("request created", slog.String("pr_id", pullRequest.ID))
 	prRes := converters.DomainPullRequestToCreatePullRequestResponse(*pullRequest)
 	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, api.PostPullRequestMerge200JSONResponse{

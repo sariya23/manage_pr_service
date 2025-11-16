@@ -18,11 +18,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestUsersGetReview тест на ручку /api/users/getReview
+// TestUsersGetReview тест на ручку /users/getReview
 // Успешное получение ревью
 func TestUsersGetReview(t *testing.T) {
 	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := 2
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -32,7 +31,7 @@ func TestUsersGetReview(t *testing.T) {
 	}
 	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
-	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode, responseCreateTeam.Header.Get("requestID"))
 	teamDB := dbT.GetTeamMembersByTeamName(ctx, requestCreateTeam.TeamName)
 	teamMemberIDs := models.TeamMemberUserIDs(teamDB)
 	authorID := random.Choice(teamMemberIDs)
@@ -40,7 +39,7 @@ func TestUsersGetReview(t *testing.T) {
 	requestCreatePR1 := factory.PullRequestCreateRequest{}
 	requestCreatePR1.RadnomInit("", "", authorID)
 	response := httpClient.PullRequestCreate(requestCreatePR1)
-	require.Equal(t, http.StatusOK, response.StatusCode)
+	require.Equal(t, http.StatusOK, response.StatusCode, response.Header.Get("requestID"))
 	requestCreatePR2 := factory.PullRequestCreateRequest{}
 	requestCreatePR2.RadnomInit("", "", authorID)
 	response = httpClient.PullRequestCreate(requestCreatePR2)
@@ -70,10 +69,10 @@ func TestUsersGetReview(t *testing.T) {
 	}
 }
 
-// TestUsersGetReview тест на ручку /api/users/getReview
+// TestUsersGetReview тест на ручку /users/getReview
 // Несуществующий юзер
 func TestUsersGetReview_NonexistentUser(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
-	responseGet := httpClient.UsersGetReview(gofakeit.LetterN(8))
+	responseGet := httpClient.UsersGetReview(gofakeit.LetterN(32))
 	require.Equal(t, http.StatusNotFound, responseGet.StatusCode)
 }

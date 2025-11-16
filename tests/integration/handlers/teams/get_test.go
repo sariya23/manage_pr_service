@@ -16,11 +16,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestTeamGet тест на ручку /api/team/get
+// TestTeamGet тест на ручку /team/get
 // Возвращаются участники команды
 func TestTeamGet(t *testing.T) {
 	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	members := []factory.AddTeamRequestMemberDTO{}
 	for range random.RandInt(1, 3) {
@@ -38,7 +37,7 @@ func TestTeamGet(t *testing.T) {
 	checkers.CheckGetTeamResponse(t, responseDTO, teamMembersDB, usersDB)
 }
 
-// TestTeamGet_NonexistentTeam тест на ручку /api/team/get
+// TestTeamGet_NonexistentTeam тест на ручку /team/get
 // Команда не найдена
 func TestTeamGet_NonexistentTeam(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()

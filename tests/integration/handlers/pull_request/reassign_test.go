@@ -19,13 +19,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestPullRequestReassign тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign тест ручки /pullRequest/reassign
 // Успешный reassign
 func TestPullRequestReassign(t *testing.T) {
 	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
-	nUsers := random.RandInt(3, 6)
+	nUsers := random.RandInt(6, 7)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
@@ -39,14 +38,13 @@ func TestPullRequestReassign(t *testing.T) {
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
 	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
-
 	prReviewers := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID).AssignedReviewerIDs
 	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
 		OldUserID:     random.Choice(helpers.Filter(prReviewers, authorID)),
 	}
 	responseReassign := httpClient.PullRequestReassign(requestReassign)
-	require.Equal(t, http.StatusOK, responseReassign.StatusCode)
+	require.Equal(t, http.StatusOK, responseReassign.StatusCode, responseReassign.Header.Get("requestID"), requestCreateTeam)
 	responseDTO := factory.PullRequestReassignFromHTTPResponseOK(responseReassign)
 	prDB := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID)
 
@@ -54,24 +52,22 @@ func TestPullRequestReassign(t *testing.T) {
 	checkers.CheckPullRequestReassignResponse(t, responseDTO, *prDB)
 }
 
-// TestPullRequestReassign_NonexistentPullRequest тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign_NonexistentPullRequest тест ручки pullRequest/reassign
 // Несуществующий PR
 func TestPullRequestReassign_NonexistentPullRequest(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
 	requestReassign := factory.PullRequestReassignRequest{
-		PullRequestID: gofakeit.LetterN(8),
-		OldUserID:     gofakeit.LetterN(8),
+		PullRequestID: gofakeit.LetterN(32),
+		OldUserID:     gofakeit.LetterN(32),
 	}
 	response := httpClient.PullRequestReassign(requestReassign)
 	require.Equal(t, http.StatusNotFound, response.StatusCode)
 }
 
-// TestPullRequestReassign_PullRequestMerged тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign_PullRequestMerged тест ручки  /pullRequest/reassign
 // Нельзя изменить вмерженный PR
 func TestPullRequestReassign_PullRequestMerged(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
-	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -91,18 +87,16 @@ func TestPullRequestReassign_PullRequestMerged(t *testing.T) {
 
 	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
-		OldUserID:     gofakeit.LetterN(8),
+		OldUserID:     gofakeit.LetterN(32),
 	}
 	response := httpClient.PullRequestReassign(requestReassign)
 	require.Equal(t, http.StatusConflict, response.StatusCode)
 }
 
-// TestPullRequestReassign_NonexistentOldUserID тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign_NonexistentOldUserID тест ручки  /pullRequest/reassign
 // Несуществующий переназначаемый пользователь
 func TestPullRequestReassign_NonexistentOldUserID(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
-	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -120,18 +114,16 @@ func TestPullRequestReassign_NonexistentOldUserID(t *testing.T) {
 
 	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
-		OldUserID:     gofakeit.LetterN(8),
+		OldUserID:     gofakeit.LetterN(32),
 	}
 	response := httpClient.PullRequestReassign(requestReassign)
 	require.Equal(t, http.StatusNotFound, response.StatusCode)
 }
 
-// TestPullRequestReassign_OldUserIsAuthor тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign_OldUserIsAuthor тест ручки  /pullRequest/reassign
 // Переназначаемый юзер - это автор PR
 func TestPullRequestReassign_OldUserIsAuthor(t *testing.T) {
 	httpClient := httpcleint.NewHTTPClient()
-	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -140,12 +132,12 @@ func TestPullRequestReassign_OldUserIsAuthor(t *testing.T) {
 	}
 	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
-	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode, responseCreateTeam.Header.Get("requestID"))
 	requestCreatePR := factory.PullRequestCreateRequest{}
 	authorID := random.Choice(members).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
-	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode, responseCreatePR.Header.Get("requestID"))
 
 	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
@@ -155,11 +147,9 @@ func TestPullRequestReassign_OldUserIsAuthor(t *testing.T) {
 	require.Equal(t, http.StatusConflict, response.StatusCode)
 }
 
-// TestPullRequestReassign_OldUserInAnotherTeam тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign_OldUserInAnotherTeam тест ручки  /pullRequest/reassign
 // Переназначаемый юзер не принадлежит команде ПРа
 func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
-	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
 	members1 := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -169,7 +159,7 @@ func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
 	}
 	requestCreateTeam1 := factory.RandomInitAddTeamRequest("", members1)
 	responseCreateTeam1 := httpClient.TeamsAdd(requestCreateTeam1)
-	require.Equal(t, http.StatusOK, responseCreateTeam1.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreateTeam1.StatusCode, responseCreateTeam1.Header.Get("requestID"))
 	members2 := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
 		isActive := true
@@ -183,7 +173,7 @@ func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
 	authorID := random.Choice(members1).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
-	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode, responseCreatePR.Header.Get("requestID"))
 
 	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: requestCreatePR.PullRequestID,
@@ -193,11 +183,10 @@ func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
 	require.Equal(t, http.StatusBadRequest, response.StatusCode)
 }
 
-// TestPullRequestReassign_OldUserIsNotReviewer тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign_OldUserIsNotReviewer тест ручки  /pullRequest/reassign
 // Переназначаемый юзер не в ревьюверах ПРа
 func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -212,7 +201,7 @@ func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 	authorID := random.Choice(members).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
-	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode, responseCreatePR.Header.Get("requestID"))
 
 	teamDB := dbT.GetTeamMembersByTeamName(ctx, requestCreateTeam.TeamName)
 	prDB := dbT.GetPullRequest(ctx, requestCreatePR.PullRequestID)
@@ -225,11 +214,10 @@ func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 	require.Equal(t, http.StatusConflict, response.StatusCode)
 }
 
-// TestPullRequestReassign_NoReviewerCandidates тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign_NoReviewerCandidates тест ручки  /pullRequest/reassign
 // Нет кандидатов на переназначение
 func TestPullRequestReassign_NoReviewerCandidates(t *testing.T) {
 	ctx := context.Background()
-	dbT.SetUp(ctx, t, tables...)
 	httpClient := httpcleint.NewHTTPClient()
 	nUsers := 2
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -239,12 +227,12 @@ func TestPullRequestReassign_NoReviewerCandidates(t *testing.T) {
 	}
 	requestCreateTeam := factory.RandomInitAddTeamRequest("", members)
 	responseCreateTeam := httpClient.TeamsAdd(requestCreateTeam)
-	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreateTeam.StatusCode, responseCreateTeam.Header.Get("requestID"))
 	requestCreatePR := factory.PullRequestCreateRequest{}
 	authorID := random.Choice(members).UserID
 	requestCreatePR.RadnomInit("", "", authorID)
 	responseCreatePR := httpClient.PullRequestCreate(requestCreatePR)
-	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode)
+	require.Equal(t, http.StatusOK, responseCreatePR.StatusCode, responseCreatePR.Header.Get("requestID"))
 
 	teamDB := dbT.GetTeamMembersByTeamName(ctx, requestCreateTeam.TeamName)
 	inActiveUser := random.Choice(helpers.Filter(models.TeamMemberUserIDs(teamDB), authorID))
@@ -263,7 +251,7 @@ func TestPullRequestReassign_NoReviewerCandidates(t *testing.T) {
 	require.Equal(t, http.StatusConflict, response.StatusCode)
 }
 
-// TestPullRequestReassign_ValidationError  тест ручки /api/pullRequest/reassign
+// TestPullRequestReassign_ValidationError  тест ручки  /pullRequest/reassign
 // Ошибки валидации
 func TestPullRequestReassign_ValidationError(t *testing.T) {
 	cases := []struct {

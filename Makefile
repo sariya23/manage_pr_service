@@ -11,7 +11,7 @@ run:
 
 .PHONY: test
 test:
-	go test -v ./...
+	go clean -testcache && go test -v ./...
 
 .PHONY: infra
 infra:
@@ -66,7 +66,7 @@ test_migrate:
 
 .PHONY: test_integrations
 test_integrations:
-	 go test -v -tags=integrations ./tests/...
+	 go clean -testcache && go test -v -tags=integrations ./tests/...
 
 .PHONY: test_service_down
 test_service_down:
