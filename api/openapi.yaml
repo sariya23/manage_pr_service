@@ -171,6 +171,32 @@
                   error:
                     code: TEAM_EXISTS
                     message: team_name already exists
+    /team/deactivate:
+      post:
+        tags: [ Teams ]
+        summary: Изменить статус активности пользователей в команде
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ user_ids, team_name ]
+                properties:
+                  user_ids:
+                    type: array
+                    items:
+                      type: string
+                      format: string
+                  team_name:
+                    type: string
+        responses:
+          '200':
+            description: 'Пользователи деактивированы'
+          '404':
+            description: 'Команда не найдена'
+          '400':
+              description: 'Один из пользователей не принадлежит команде'
 
     /team/get:
       get:

@@ -16,6 +16,7 @@ type TeamRepository interface {
 
 type UserRepository interface {
 	GetUserByID(ctx context.Context, userID string) (*domain.User, error)
+	MultiDeactivate(ctx context.Context, userIDs []string) error
 }
 
 type TeamsService struct {

@@ -16,4 +16,5 @@ var (
 	ErrUserIsNotReviewer        = errors.New("user is not reviewer")
 	ErrNoReviewerCandidates     = errors.New("no reviewers candidates")
 	ErrUserNotInPullRequestTeam = errors.New("user not in pull request team")
+	ErrUserNotInTeam            = errors.New("user not in team")
 )
