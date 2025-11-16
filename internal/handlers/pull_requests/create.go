@@ -14,7 +14,7 @@ import (
 	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators"
 )
 
-func (i *PullRequestImplementation) Create(w http.ResponseWriter, r *http.Request) {
+func (i PullRequestImplementation) PostPullRequestCreate(w http.ResponseWriter, r *http.Request) {
 	const operationPlace = "handlers.pull_request.Create"
 	log := i.logger.With("operationPlace", operationPlace)
 	ctx := r.Context()

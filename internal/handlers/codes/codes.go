@@ -1,4 +1,4 @@
-package handlers
+package codes
 
 import api "github.com/sariya23/manage_pr_service/internal/generated"
 

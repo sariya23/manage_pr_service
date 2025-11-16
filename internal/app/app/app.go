@@ -5,9 +5,10 @@ import (
 	"log/slog"
 	"strconv"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/sariya23/manage_pr_service/internal/app/server"
 	cfg "github.com/sariya23/manage_pr_service/internal/config"
+	api "github.com/sariya23/manage_pr_service/internal/generated"
+	"github.com/sariya23/manage_pr_service/internal/handlers"
 	"github.com/sariya23/manage_pr_service/internal/handlers/analytics"
 	apidebug "github.com/sariya23/manage_pr_service/internal/handlers/debug"
 	api_pull_requests "github.com/sariya23/manage_pr_service/internal/handlers/pull_requests"
@@ -54,30 +55,10 @@ func NewApp(ctx context.Context, logger *slog.Logger, config *cfg.Config) *App {
 	teamsImpl := apiteams.NewTeamsImplementation(logger, teamService)
 	pullRequestImpl := api_pull_requests.NewPullRequestImplementation(logger, pullRequestService)
 	analyticsImpl := analytics.NewAnalyticsImplementation(logger, analyticsService)
-
-	r := chi.NewRouter()
-	r.Route("/api", func(r chi.Router) {
-		r.Route("/debug", func(r chi.Router) {
-			r.Get("/ping", debugImpl.Ping)
-		})
-		r.Route("/users", func(r chi.Router) {
-			r.Post("/setIsActive", userImpl.SetIsActive)
-			r.Get("/getReview/{user_id}", userImpl.GetReview)
-		})
-		r.Route("/team", func(r chi.Router) {
-			r.Post("/add", teamsImpl.Add)
-			r.Get("/get/{team_name}", teamsImpl.Get)
-		})
-		r.Route("/pullRequest", func(r chi.Router) {
-			r.Post("/create", pullRequestImpl.Create)
-			r.Post("/merge", pullRequestImpl.Merge)
-			r.Post("/reassign", pullRequestImpl.Reassign)
-		})
-		r.Route("/analytics", func(r chi.Router) {
-			r.Get("/usersPRs", analyticsImpl.UsersPRs)
-		})
-	})
-	srv := server.NewServer(config.HTTPServerHost, config.HTTPServerPort, r)
+	impl := handlers.NewImplementation(debugImpl, analyticsImpl, userImpl, teamsImpl, pullRequestImpl)
+	
+	router := api.HandlerWithOptions(impl, api.ChiServerOptions{BaseURL: "/api"})
+	srv := server.NewServer(config.HTTPServerHost, config.HTTPServerPort, router)
 	return &App{srv: srv}
 }
 

@@ -2,10 +2,10 @@ package apiusers
 
 import (
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
@@ -14,11 +14,12 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/validators"
 )
 
-func (i *UsersImplementation) GetReview(w http.ResponseWriter, r *http.Request) {
+func (i UsersImplementation) GetUsersGetReview(w http.ResponseWriter, r *http.Request, params api.GetUsersGetReviewParams) {
 	ctx := r.Context()
 	const operationPlace = "handlers.users.GetReview"
 	log := i.logger.With("operationPlace", operationPlace)
-	userID := chi.URLParam(r, "user_id")
+	userID := params.UserId
+	fmt.Println(userID)
 	if msg, valid := validators.ValidateGetUserReviewRequest(userID); !valid {
 		log.Warn("invalid request", slog.String("user_id", userID), slog.String("message", msg))
 		w.WriteHeader(http.StatusBadRequest)

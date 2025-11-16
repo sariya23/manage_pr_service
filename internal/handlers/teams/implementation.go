@@ -17,8 +17,8 @@ type TeamsImplementation struct {
 	teamsService TeamService
 }
 
-func NewTeamsImplementation(log *slog.Logger, teamsSrv TeamService) *TeamsImplementation {
-	return &TeamsImplementation{
+func NewTeamsImplementation(log *slog.Logger, teamsSrv TeamService) TeamsImplementation {
+	return TeamsImplementation{
 		logger:       log,
 		teamsService: teamsSrv,
 	}

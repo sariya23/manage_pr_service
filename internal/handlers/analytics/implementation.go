@@ -14,8 +14,8 @@ type AnalyticsImplementation struct {
 	PullRequestService PullRequestService
 }
 
-func NewAnalyticsImplementation(log *slog.Logger, pullRequestRepo PullRequestService) *AnalyticsImplementation {
-	return &AnalyticsImplementation{
+func NewAnalyticsImplementation(log *slog.Logger, pullRequestRepo PullRequestService) AnalyticsImplementation {
+	return AnalyticsImplementation{
 		log:                log,
 		PullRequestService: pullRequestRepo,
 	}

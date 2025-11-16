@@ -8,7 +8,7 @@ import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 )
 
-func (i *AnalyticsImplementation) UsersPRs(w http.ResponseWriter, r *http.Request) {
+func (i AnalyticsImplementation) GetAnalyticsUsersPRs(w http.ResponseWriter, r *http.Request) {
 	const operationPlace = "handlers.analytics.UsersPRs"
 	log := i.log.With("operationPlace", operationPlace)
 	ctx := r.Context()

@@ -13,7 +13,7 @@ import (
 	teamsvalidators "github.com/sariya23/manage_pr_service/internal/validators"
 )
 
-func (i *TeamsImplementation) Add(w http.ResponseWriter, r *http.Request) {
+func (i TeamsImplementation) PostTeamAdd(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	const operationPlace = "handlers.teams.Add"
 	log := i.logger.With("operationPlace", operationPlace)

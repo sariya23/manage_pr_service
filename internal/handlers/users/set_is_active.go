@@ -14,7 +14,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/validators"
 )
 
-func (i *UsersImplementation) SetIsActive(w http.ResponseWriter, r *http.Request) {
+func (i UsersImplementation) PostUsersSetIsActive(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	const operationPlace = "handlers.users.SetIsActive"
 	log := i.logger.With("operationPlace", operationPlace)

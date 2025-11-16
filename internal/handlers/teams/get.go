@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
@@ -14,11 +13,11 @@ import (
 	teamsvalidators "github.com/sariya23/manage_pr_service/internal/validators"
 )
 
-func (i *TeamsImplementation) Get(w http.ResponseWriter, r *http.Request) {
+func (i TeamsImplementation) GetTeamGet(w http.ResponseWriter, r *http.Request, params api.GetTeamGetParams) {
 	ctx := r.Context()
 	const operationPlace = "handlers.users.GetReview"
 	log := i.logger.With("operationPlace", operationPlace)
-	teamName := chi.URLParam(r, "team_name")
+	teamName := params.TeamName
 
 	if msg, valid := teamsvalidators.ValidateTeamGet(teamName); !valid {
 		log.Warn("invalid request", slog.String("team_name", teamName), slog.String("message", msg))

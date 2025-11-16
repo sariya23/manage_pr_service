@@ -13,7 +13,7 @@ import (
 	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators"
 )
 
-func (i *PullRequestImplementation) Reassign(w http.ResponseWriter, r *http.Request) {
+func (i PullRequestImplementation) PostPullRequestReassign(w http.ResponseWriter, r *http.Request) {
 	const operationPlace = "handlers.pull_request.Reassign"
 	log := i.logger.With("operationPlace", operationPlace)
 	ctx := r.Context()

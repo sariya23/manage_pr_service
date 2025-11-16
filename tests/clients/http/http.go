@@ -37,7 +37,7 @@ func (c *HTTPClient) TeamsAdd(req factory.AddTeamRequest) *http.Response {
 }
 
 func (c *HTTPClient) TeamGet(teamName string) *http.Response {
-	resp, err := c.cl.Get(fmt.Sprintf("http://localhost:%d/api/team/get/%s", c.port, teamName))
+	resp, err := c.cl.Get(fmt.Sprintf("http://localhost:%d/api/team/get?team_name=%s", c.port, teamName))
 	if err != nil {
 		panic(err)
 	}
@@ -54,7 +54,7 @@ func (c *HTTPClient) UsersSetIsActive(req factory.SetIsActiveRequest) *http.Resp
 }
 
 func (c *HTTPClient) UsersGetReview(userID string) *http.Response {
-	resp, err := c.cl.Get(fmt.Sprintf("http://localhost:%d/api/users/getReview/%s", c.port, userID))
+	resp, err := c.cl.Get(fmt.Sprintf("http://localhost:%d/api/users/getReview?user_id=%s", c.port, userID))
 	if err != nil {
 		panic(err)
 	}

@@ -22,10 +22,7 @@ func RandomInitAddTeamRequestMemberDT(userID string, username string, isActive *
 		userID = gofakeit.LetterN(uint(random.RandInt(1, 8)))
 	}
 	if username == "" {
-		username = gofakeit.Username()
-		if len(username) > 37 {
-			username = username[:37]
-		}
+		username = gofakeit.LetterN(25)
 	}
 	var active bool
 	if isActive == nil {
@@ -57,7 +54,7 @@ func (r *AddTeamRequest) ToJSON() io.Reader {
 
 func RandomInitAddTeamRequest(teamName string, members []AddTeamRequestMemberDTO) AddTeamRequest {
 	if teamName == "" {
-		teamName = gofakeit.Name()
+		teamName = gofakeit.LetterN(8)
 	}
 	membersN := random.RandInt(1, 3)
 	resMembers := make([]AddTeamRequestMemberDTO, 0, membersN)

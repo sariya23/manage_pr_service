@@ -13,7 +13,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
 
-func (i *PullRequestImplementation) Merge(w http.ResponseWriter, r *http.Request) {
+func (i PullRequestImplementation) PostPullRequestMerge(w http.ResponseWriter, r *http.Request) {
 	const operationPlace = "handlers.pull_request.Merge"
 	log := i.logger.With("operationPlace", operationPlace)
 	ctx := r.Context()

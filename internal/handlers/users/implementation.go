@@ -18,8 +18,8 @@ type UsersImplementation struct {
 	userService userService
 }
 
-func NewUsersImplementation(logger *slog.Logger, userService userService) *UsersImplementation {
-	return &UsersImplementation{
+func NewUsersImplementation(logger *slog.Logger, userService userService) UsersImplementation {
+	return UsersImplementation{
 		logger:      logger,
 		userService: userService,
 	}
