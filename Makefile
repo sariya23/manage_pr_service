@@ -25,9 +25,13 @@ migrate:
 	@$(POSTGRES_HOST_OUTER):$(POSTGRES_PORT)/$(POSTGRES_DB)\
 	?sslmode=$(SSL_MODE)" up
 
-.PHONU: lint
+.PHONY: lint
 lint:
 	revive ./...
+
+.PHONY: gen
+gen:
+	oapi-codegen --config .oapi-codegen.yaml api/openapi.yaml
 
 # LOCAL
 .PHONY: service_up
