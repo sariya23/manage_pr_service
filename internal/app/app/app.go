@@ -58,7 +58,8 @@ func NewApp(ctx context.Context, logger *slog.Logger, config *cfg.Config) *App {
 	analyticsImpl := analytics.NewAnalyticsImplementation(logger, analyticsService)
 	impl := handlers.NewImplementation(debugImpl, analyticsImpl, userImpl, teamsImpl, pullRequestImpl)
 
-	router := api.HandlerWithOptions(impl, api.ChiServerOptions{Middlewares: []api.MiddlewareFunc{middleware.RequestIDMiddleware}})
+	router := api.HandlerWithOptions(impl, api.ChiServerOptions{Middlewares: []api.MiddlewareFunc{middleware.RequestIDMiddleware,
+		middleware.Logger}})
 	srv := server.NewServer(config.HTTPServerHost, config.HTTPServerPort, router)
 	return &App{srv: srv}
 }
