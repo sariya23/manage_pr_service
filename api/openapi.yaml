@@ -7,7 +7,8 @@ tags:
   - name: Teams
   - name: Users
   - name: PullRequests
-  - name: Health
+  - name: Debug
+  - name: Analytics
 
 components:
   parameters:
@@ -438,3 +439,6 @@ paths:
                     pull_request_name: Add search
                     author_id: u1
                     status: OPEN
+  /debug/ping:
+    get:
+      tags: [Debug]

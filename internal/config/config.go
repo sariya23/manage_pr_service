@@ -19,6 +19,7 @@ type Config struct {
 	PostgresOuterHost string `env:"POSTGRES_HOST_OUTER"`
 	SSLMode           string `env:"SSL_MODE"`
 	ConfigPath        string `env:"CONFIG_PATH"`
+	Env               string `env:"ENV"`
 }
 
 // MustLoad - загрузка данных из .env в конфиг.
