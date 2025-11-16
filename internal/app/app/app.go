@@ -14,6 +14,7 @@ import (
 	api_pull_requests "github.com/sariya23/manage_pr_service/internal/handlers/pull_requests"
 	apiteams "github.com/sariya23/manage_pr_service/internal/handlers/teams"
 	apiusers "github.com/sariya23/manage_pr_service/internal/handlers/users"
+	"github.com/sariya23/manage_pr_service/internal/middleware"
 	serviceanalytics "github.com/sariya23/manage_pr_service/internal/service/analytics"
 	service_pull_request "github.com/sariya23/manage_pr_service/internal/service/pull_request"
 	serviceteams "github.com/sariya23/manage_pr_service/internal/service/teams"
@@ -56,8 +57,8 @@ func NewApp(ctx context.Context, logger *slog.Logger, config *cfg.Config) *App {
 	pullRequestImpl := api_pull_requests.NewPullRequestImplementation(logger, pullRequestService)
 	analyticsImpl := analytics.NewAnalyticsImplementation(logger, analyticsService)
 	impl := handlers.NewImplementation(debugImpl, analyticsImpl, userImpl, teamsImpl, pullRequestImpl)
-	
-	router := api.HandlerWithOptions(impl, api.ChiServerOptions{BaseURL: "/api"})
+
+	router := api.HandlerWithOptions(impl, api.ChiServerOptions{BaseURL: "/api", Middlewares: []api.MiddlewareFunc{middleware.RequestIDMiddleware}})
 	srv := server.NewServer(config.HTTPServerHost, config.HTTPServerPort, router)
 	return &App{srv: srv}
 }
