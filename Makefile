@@ -36,7 +36,7 @@ gen:
 # LOCAL
 .PHONY: service_up
 service_up:
-	docker-compose -p pg_manage_service -f deployments/docker/local/docker-compose.yaml  \
+	docker-compose -p pr_manage_service -f deployments/docker/local/docker-compose.yaml  \
 	--env-file ./config/local.env up -d
 
 .PHONY: service_migrate_inner
@@ -49,7 +49,7 @@ service_migrate_inner:
 
 .PHONY: service_down
 service_down:
-	docker-compose -p pg_manage_service -f deployments/docker/local/docker-compose.yaml \
+	docker-compose -p pr_manage_service -f deployments/docker/local/docker-compose.yaml \
 	--env-file ./config/local.env rm -fvs
 
 
