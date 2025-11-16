@@ -10,7 +10,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/sariya23/manage_pr_service/tests/checkers"
-	httpcleint "github.com/sariya23/manage_pr_service/tests/clients/http"
+	httpclient "github.com/sariya23/manage_pr_service/tests/clients/http"
 	"github.com/sariya23/manage_pr_service/tests/factory"
 	"github.com/sariya23/manage_pr_service/tests/helpers"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
@@ -23,7 +23,7 @@ import (
 // Успешный reassign
 func TestPullRequestReassign(t *testing.T) {
 	ctx := context.Background()
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(6, 7)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -55,7 +55,7 @@ func TestPullRequestReassign(t *testing.T) {
 // TestPullRequestReassign_NonexistentPullRequest тест ручки pullRequest/reassign
 // Несуществующий PR
 func TestPullRequestReassign_NonexistentPullRequest(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	requestReassign := factory.PullRequestReassignRequest{
 		PullRequestID: gofakeit.LetterN(32),
 		OldUserID:     gofakeit.LetterN(32),
@@ -67,7 +67,7 @@ func TestPullRequestReassign_NonexistentPullRequest(t *testing.T) {
 // TestPullRequestReassign_PullRequestMerged тест ручки  /pullRequest/reassign
 // Нельзя изменить вмерженный PR
 func TestPullRequestReassign_PullRequestMerged(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -96,7 +96,7 @@ func TestPullRequestReassign_PullRequestMerged(t *testing.T) {
 // TestPullRequestReassign_NonexistentOldUserID тест ручки  /pullRequest/reassign
 // Несуществующий переназначаемый пользователь
 func TestPullRequestReassign_NonexistentOldUserID(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -123,7 +123,7 @@ func TestPullRequestReassign_NonexistentOldUserID(t *testing.T) {
 // TestPullRequestReassign_OldUserIsAuthor тест ручки  /pullRequest/reassign
 // Переназначаемый юзер - это автор PR
 func TestPullRequestReassign_OldUserIsAuthor(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -150,7 +150,7 @@ func TestPullRequestReassign_OldUserIsAuthor(t *testing.T) {
 // TestPullRequestReassign_OldUserInAnotherTeam тест ручки  /pullRequest/reassign
 // Переназначаемый юзер не принадлежит команде ПРа
 func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
 	members1 := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -187,7 +187,7 @@ func TestPullRequestReassign_OldUserInAnotherTeam(t *testing.T) {
 // Переназначаемый юзер не в ревьюверах ПРа
 func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 	ctx := context.Background()
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(4, 6)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -218,7 +218,7 @@ func TestPullRequestReassign_OldUserIsNotReviewer(t *testing.T) {
 // Нет кандидатов на переназначение
 func TestPullRequestReassign_NoReviewerCandidates(t *testing.T) {
 	ctx := context.Background()
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := 2
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -269,7 +269,7 @@ func TestPullRequestReassign_ValidationError(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			httpClient := httpcleint.NewHTTPClient()
+			httpClient := httpclient.NewHTTPClient()
 			response := httpClient.PullRequestReassign(c.request)
 			require.Equal(t, http.StatusBadRequest, response.StatusCode)
 		})

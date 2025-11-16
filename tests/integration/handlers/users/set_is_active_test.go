@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
-	httpcleint "github.com/sariya23/manage_pr_service/tests/clients/http"
+	httpclient "github.com/sariya23/manage_pr_service/tests/clients/http"
 	"github.com/sariya23/manage_pr_service/tests/factory"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
 	"github.com/stretchr/testify/assert"
@@ -19,7 +19,7 @@ import (
 // Успешная деактивация пользователя
 func TestSetIsActive(t *testing.T) {
 	ctx := context.Background()
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -48,7 +48,7 @@ func TestSetIsActive(t *testing.T) {
 // TestSetIsActive_NonexistentUser тест ручки /users/setIsActive
 // Ошибка, при попытке обновить несущесвующего пользователя
 func TestSetIsActive_NonexistentUser(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	request := factory.SetIsActiveRequest{UserID: gofakeit.LetterN(32), IsActive: false}
 	response := httpClient.UsersSetIsActive(request)
 	require.Equal(t, http.StatusNotFound, response.StatusCode)
@@ -57,7 +57,7 @@ func TestSetIsActive_NonexistentUser(t *testing.T) {
 // TestSetIsActive_EmptyUserID тест ручки /users/setIsActive
 // Пустой айдишник пользователя
 func TestSetIsActive_EmptyUserID(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	request := factory.SetIsActiveRequest{UserID: "", IsActive: false}
 	response := httpClient.UsersSetIsActive(request)
 	require.Equal(t, http.StatusBadRequest, response.StatusCode)

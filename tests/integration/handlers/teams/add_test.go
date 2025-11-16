@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/sariya23/manage_pr_service/tests/checkers"
-	httpcleint "github.com/sariya23/manage_pr_service/tests/clients/http"
+	httpclient "github.com/sariya23/manage_pr_service/tests/clients/http"
 	"github.com/sariya23/manage_pr_service/tests/factory"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
 	"github.com/sariya23/manage_pr_service/tests/models"
@@ -19,7 +19,7 @@ import (
 // Создание новой команды и новых юзеров
 func TestAddTeam_NewTeamNewUsers(t *testing.T) {
 	ctx := context.Background()
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	members := []factory.AddTeamRequestMemberDTO{}
 	for range random.RandInt(1, 3) {
 		isActive := true
@@ -39,7 +39,7 @@ func TestAddTeam_NewTeamNewUsers(t *testing.T) {
 // Добавление новых юзеров в существующую команду
 func TestAddTeam_AddUsersToTeam(t *testing.T) {
 	ctx := context.Background()
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	// Предварительно создаем команду с юзерами
 	nUsers := random.RandInt(1, 3)
 	membersInit := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
@@ -70,7 +70,7 @@ func TestAddTeam_AddUsersToTeam(t *testing.T) {
 // TestAddTeam_InActiveUsers тест ручки /team/add
 // Если хотя бы один пользователь неактивен, то возвращается ошибка
 func TestAddTeam_InActiveUsers(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	membersInit := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -87,7 +87,7 @@ func TestAddTeam_InActiveUsers(t *testing.T) {
 // // TestAddTeam_InActiveUsers тест ручки /team/add
 // // При попытке добавить пользователя из другой команды возвращается ошибка
 func TestAddTeam_UserFromAnotherTeam(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	membersInit := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -113,7 +113,7 @@ func TestAddTeam_UserFromAnotherTeam(t *testing.T) {
 // TestAddTeam_EmptyTeamName тест ручки /team/add
 // В запросе не передано название команды
 func TestAddTeam_EmptyTeamName(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	request := factory.RandomInitAddTeamRequest("", nil)
 	request.TeamName = ""
 	response := httpClient.TeamsAdd(request)

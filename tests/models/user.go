@@ -18,3 +18,12 @@ func UserSortByUserID(users []User) {
 		return users[i].UserID < users[j].UserID
 	})
 }
+
+func GetByID(users []User, id string) User {
+	for _, user := range users {
+		if user.UserID == id {
+			return user
+		}
+	}
+	return User{}
+}

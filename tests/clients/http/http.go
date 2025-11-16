@@ -1,6 +1,6 @@
 //go:build integrations
 
-package httpcleint
+package httpclient
 
 import (
 	"fmt"
@@ -38,6 +38,15 @@ func (c *HTTPClient) TeamsAdd(req factory.AddTeamRequest) *http.Response {
 
 func (c *HTTPClient) TeamGet(teamName string) *http.Response {
 	resp, err := c.cl.Get(fmt.Sprintf("http://localhost:%d/team/get?team_name=%s", c.port, teamName))
+	if err != nil {
+		panic(err)
+	}
+	return resp
+}
+
+func (c *HTTPClient) TeamDeactivate(req factory.TeamsDeactivateRequest) *http.Response {
+	reqJson := req.ToJSON()
+	resp, err := c.cl.Post(fmt.Sprintf("http://localhost:%d/team/deactivate", c.port), "application/json", reqJson)
 	if err != nil {
 		panic(err)
 	}
