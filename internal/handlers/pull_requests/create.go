@@ -10,6 +10,7 @@ import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/lib/errorhandler"
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/models/dto"
 	pull_request_validators "github.com/sariya23/manage_pr_service/internal/validators"
 )
@@ -18,9 +19,12 @@ func (i PullRequestImplementation) PostPullRequestCreate(w http.ResponseWriter, 
 	const operationPlace = "handlers.pull_request.Create"
 	log := i.logger.With("operationPlace", operationPlace)
 	ctx := r.Context()
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
+	w.Header().Set("requestID", requestID)
 
-	var request api.PostPullRequestCreateJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	var rq api.PostPullRequestCreateJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&rq); err != nil {
 		log.Error("error decoding request body", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse("invalid json"))
@@ -32,14 +36,14 @@ func (i PullRequestImplementation) PostPullRequestCreate(w http.ResponseWriter, 
 		}
 	}()
 
-	if msg, valid := pull_request_validators.ValidatePullRequestCreateRequest(request); !valid {
+	if msg, valid := pull_request_validators.ValidatePullRequestCreateRequest(rq); !valid {
 		log.Warn("invalid request", slog.String("message", msg))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse(msg))
 		return
 	}
 
-	pullRequest, err := i.prService.CreatePullRequestAndAssignReviewers(ctx, dto.FromCreatePullRequestHTTP(request))
+	pullRequest, err := i.prService.CreatePullRequestAndAssignReviewers(ctx, dto.FromCreatePullRequestHTTP(rq))
 	if status, resp, isError := errorhandler.PullRequestCreate(err); isError {
 		w.WriteHeader(status)
 		render.JSON(w, r, resp)

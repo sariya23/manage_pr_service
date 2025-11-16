@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
 
 func (s *UsersService) GetUserTeam(ctx context.Context, userID string) (string, error) {
 	const operationPlace = "service.users.GetUserTeam"
 	log := s.log.With("operationPlace", operationPlace)
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
 
 	teamName, err := s.teamRepo.GetUserTeam(ctx, userID)
 	if err != nil {

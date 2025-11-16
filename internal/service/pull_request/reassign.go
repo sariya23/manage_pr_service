@@ -8,6 +8,7 @@ import (
 	"slices"
 
 	"github.com/sariya23/manage_pr_service/internal/lib/random"
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
@@ -15,6 +16,8 @@ import (
 func (s *PullRequestService) Reassign(ctx context.Context, prID string, oldReviewerID string) (*domain.PullRequest, string, error) {
 	const operationPlace = "service.pull_request.Reassign"
 	log := s.log.With("operationPlace", operationPlace)
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
 
 	pr, err := s.PullRequestRepo.GetPullRequest(ctx, prID)
 	if err != nil {

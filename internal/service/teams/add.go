@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"slices"
 
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
@@ -14,6 +15,8 @@ import (
 func (s *TeamsService) Add(ctx context.Context, teamName string, membersRequest []domain.User) ([]domain.User, error) {
 	const operationPlace = "service.teams.Add"
 	log := s.log.With("operationPlace", operationPlace)
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
 	members, err := s.teamRepository.GetTeamMembers(ctx, teamName)
 	if err != nil {
 		log.Error("failed to check team existence",

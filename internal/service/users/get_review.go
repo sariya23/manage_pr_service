@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
@@ -13,6 +14,8 @@ import (
 func (s *UsersService) GetReviews(ctx context.Context, userID string) ([]domain.PullRequest, error) {
 	const operationPlace = "service.users.GetReview"
 	log := s.log.With("operationPlace", operationPlace)
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
 	_, err := s.userRepo.GetUserByID(ctx, userID)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {

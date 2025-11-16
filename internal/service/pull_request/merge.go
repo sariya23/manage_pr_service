@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
@@ -13,6 +14,8 @@ import (
 func (s *PullRequestService) Merge(ctx context.Context, prID string) (*domain.PullRequest, error) {
 	const operationPlace = "service.pull_request.Merge"
 	log := s.log.With("operationPlace", operationPlace)
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
 
 	pr, err := s.PullRequestRepo.GetPullRequest(ctx, prID)
 	if err != nil {

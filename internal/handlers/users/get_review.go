@@ -2,7 +2,6 @@ package apiusers
 
 import (
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 
@@ -10,6 +9,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 	"github.com/sariya23/manage_pr_service/internal/validators"
 )
@@ -18,24 +18,27 @@ func (i UsersImplementation) GetUsersGetReview(w http.ResponseWriter, r *http.Re
 	ctx := r.Context()
 	const operationPlace = "handlers.users.GetReview"
 	log := i.logger.With("operationPlace", operationPlace)
-	userID := params.UserId
-	fmt.Println(userID)
-	if msg, valid := validators.ValidateGetUserReviewRequest(userID); !valid {
-		log.Warn("invalid request", slog.String("user_id", userID), slog.String("message", msg))
+	requestID := request.GetIDKey(ctx)
+	w.Header().Set("requestID", requestID)
+	log = log.With("request_id", requestID)
+
+	if msg, valid := validators.ValidateGetUserReviewRequest(params.UserId); !valid {
+		log.Warn("invalid request", slog.String("user_id", params.UserId), slog.String("message", msg))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse(msg))
 		return
 	}
 
-	pullRequests, err := i.userService.GetReviews(ctx, userID)
+	pullRequests, err := i.userService.GetReviews(ctx, params.UserId)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {
-			log.Warn("user not found", slog.String("user_id", userID))
+			log.Warn("user not found", slog.String("user_id", params.UserId))
 			w.WriteHeader(http.StatusNotFound)
+
 			render.JSON(w, r, erresponse.MakeNotFoundResponse("user not found"))
 			return
 		}
-		log.Error("unexpected error", slog.String("user_id", userID), slog.String("error", err.Error()))
+		log.Error("unexpected error", slog.String("user_id", params.UserId), slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
 		return
@@ -43,5 +46,5 @@ func (i UsersImplementation) GetUsersGetReview(w http.ResponseWriter, r *http.Re
 
 	prResponse := converters.MultiDomainPullRequestToGetReviewResponse(pullRequests)
 	w.WriteHeader(http.StatusOK)
-	render.JSON(w, r, api.GetUsersGetReview200JSONResponse{PullRequests: prResponse, UserId: userID})
+	render.JSON(w, r, api.GetUsersGetReview200JSONResponse{PullRequests: prResponse, UserId: params.UserId})
 }

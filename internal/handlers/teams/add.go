@@ -10,6 +10,7 @@ import (
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
 	"github.com/sariya23/manage_pr_service/internal/lib/errorhandler"
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	teamsvalidators "github.com/sariya23/manage_pr_service/internal/validators"
 )
 
@@ -17,9 +18,12 @@ func (i TeamsImplementation) PostTeamAdd(w http.ResponseWriter, r *http.Request)
 	ctx := r.Context()
 	const operationPlace = "handlers.teams.Add"
 	log := i.logger.With("operationPlace", operationPlace)
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
+	w.Header().Set("requestID", requestID)
 
-	var request api.PostTeamAddJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	var rq api.PostTeamAddJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&rq); err != nil {
 		log.Error("error decoding request body", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse("invalid json"))
@@ -31,15 +35,15 @@ func (i TeamsImplementation) PostTeamAdd(w http.ResponseWriter, r *http.Request)
 		}
 	}()
 
-	if msg, valid := teamsvalidators.ValidateTeamAddRequest(request); !valid {
+	if msg, valid := teamsvalidators.ValidateTeamAddRequest(rq); !valid {
 		log.Warn("invalid request", slog.String("message", msg))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse(msg))
 		return
 	}
 
-	members, err := i.teamsService.Add(ctx, request.TeamName, converters.MultiAddTeamUserToDomainUser(request.Members))
-	if status, resp, isError := errorhandler.TeamAdd(err, request.TeamName); isError {
+	members, err := i.teamsService.Add(ctx, rq.TeamName, converters.MultiAddTeamUserToDomainUser(rq.Members))
+	if status, resp, isError := errorhandler.TeamAdd(err, rq.TeamName); isError {
 		w.WriteHeader(status)
 		render.JSON(w, r, resp)
 		return
@@ -47,6 +51,6 @@ func (i TeamsImplementation) PostTeamAdd(w http.ResponseWriter, r *http.Request)
 	w.WriteHeader(http.StatusOK)
 	render.JSON(w, r, api.PostTeamAdd201JSONResponse{Team: &api.Team{
 		Members:  converters.MultiDomainUserToAddTeamResponse(members),
-		TeamName: request.TeamName,
+		TeamName: rq.TeamName,
 	}})
 }

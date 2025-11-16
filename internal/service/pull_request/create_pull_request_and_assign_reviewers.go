@@ -7,6 +7,7 @@ import (
 	"log/slog"
 
 	"github.com/sariya23/manage_pr_service/internal/lib/random"
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/models/domain"
 	"github.com/sariya23/manage_pr_service/internal/models/dto"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
@@ -15,7 +16,8 @@ import (
 func (s *PullRequestService) CreatePullRequestAndAssignReviewers(ctx context.Context, prData dto.CreatePullRequestDTO) (*domain.PullRequest, error) {
 	const operationPlace = "service.pull_request.create_pull_request_and_assign_reviewers"
 	log := s.log.With("operation_place", operationPlace)
-
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
 	_, err := s.PullRequestRepo.GetPullRequest(ctx, prData.ID)
 	if err != nil {
 		if !errors.Is(err, outerror.ErrPullRequestNotFound) {

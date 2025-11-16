@@ -10,6 +10,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 	"github.com/sariya23/manage_pr_service/internal/validators"
 )
@@ -18,9 +19,12 @@ func (i UsersImplementation) PostUsersSetIsActive(w http.ResponseWriter, r *http
 	ctx := r.Context()
 	const operationPlace = "handlers.users.SetIsActive"
 	log := i.logger.With("operationPlace", operationPlace)
-	var request api.PostUsersSetIsActiveJSONRequestBody
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
+	w.Header().Set("requestID", requestID)
+	var rq api.PostUsersSetIsActiveJSONRequestBody
 
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&rq); err != nil {
 		log.Error("error decoding request body", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse("invalid json"))
@@ -32,21 +36,21 @@ func (i UsersImplementation) PostUsersSetIsActive(w http.ResponseWriter, r *http
 		}
 	}()
 
-	if msg, valid := validators.ValidateSetIsActiveUserRequest(request); !valid {
-		log.Warn("invalid request", slog.String("user_id", request.UserId), slog.String("message", msg))
+	if msg, valid := validators.ValidateSetIsActiveUserRequest(rq); !valid {
+		log.Warn("invalid request", slog.String("user_id", rq.UserId), slog.String("message", msg))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse(msg))
 		return
 	}
-	domainUser, err := i.userService.SetIsActive(ctx, request.UserId, request.IsActive)
+	domainUser, err := i.userService.SetIsActive(ctx, rq.UserId, rq.IsActive)
 	if err != nil {
 		if errors.Is(err, outerror.ErrUserNotFound) {
-			log.Warn("user not found", slog.String("user_id", request.UserId))
+			log.Warn("user not found", slog.String("user_id", rq.UserId))
 			w.WriteHeader(http.StatusNotFound)
 			render.JSON(w, r, erresponse.MakeNotFoundResponse("user not found"))
 			return
 		}
-		log.Error("unexpected error", slog.String("user_id", request.UserId), slog.String("error", err.Error()))
+		log.Error("unexpected error", slog.String("user_id", rq.UserId), slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		render.JSON(w, r, erresponse.MakeInternalResponse("internal server error"))
 		return

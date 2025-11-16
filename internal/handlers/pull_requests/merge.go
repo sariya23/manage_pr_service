@@ -10,6 +10,7 @@ import (
 	"github.com/sariya23/manage_pr_service/internal/converters"
 	api "github.com/sariya23/manage_pr_service/internal/generated"
 	"github.com/sariya23/manage_pr_service/internal/lib/erresponse"
+	"github.com/sariya23/manage_pr_service/internal/lib/request"
 	"github.com/sariya23/manage_pr_service/internal/outerror"
 )
 
@@ -17,9 +18,12 @@ func (i PullRequestImplementation) PostPullRequestMerge(w http.ResponseWriter, r
 	const operationPlace = "handlers.pull_request.Merge"
 	log := i.logger.With("operationPlace", operationPlace)
 	ctx := r.Context()
+	requestID := request.GetIDKey(ctx)
+	log = log.With("request_id", requestID)
+	w.Header().Set("requestID", requestID)
 
-	var request api.PostPullRequestMergeJSONRequestBody
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	var rq api.PostPullRequestMergeJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&rq); err != nil {
 		log.Error("error decoding request body", slog.String("error", err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse("invalid json"))
@@ -31,14 +35,14 @@ func (i PullRequestImplementation) PostPullRequestMerge(w http.ResponseWriter, r
 		}
 	}()
 
-	if request.PullRequestId == "" {
+	if rq.PullRequestId == "" {
 		log.Warn("invalid request", slog.String("message", "pull_request_id is required"))
 		w.WriteHeader(http.StatusBadRequest)
 		render.JSON(w, r, erresponse.MakeInvalidResponse("pull_request_id is required"))
 		return
 	}
 
-	pr, err := i.prService.Merge(ctx, request.PullRequestId)
+	pr, err := i.prService.Merge(ctx, rq.PullRequestId)
 	if err != nil {
 		if errors.Is(err, outerror.ErrPullRequestNotFound) {
 			w.WriteHeader(http.StatusNotFound)
