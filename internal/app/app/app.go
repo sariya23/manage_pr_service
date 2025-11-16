@@ -8,10 +8,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/sariya23/manage_pr_service/internal/app/server"
 	cfg "github.com/sariya23/manage_pr_service/internal/config"
+	"github.com/sariya23/manage_pr_service/internal/handlers/analytics"
 	apidebug "github.com/sariya23/manage_pr_service/internal/handlers/debug"
 	api_pull_requests "github.com/sariya23/manage_pr_service/internal/handlers/pull_requests"
 	apiteams "github.com/sariya23/manage_pr_service/internal/handlers/teams"
 	apiusers "github.com/sariya23/manage_pr_service/internal/handlers/users"
+	serviceanalytics "github.com/sariya23/manage_pr_service/internal/service/analytics"
 	service_pull_request "github.com/sariya23/manage_pr_service/internal/service/pull_request"
 	serviceteams "github.com/sariya23/manage_pr_service/internal/service/teams"
 	serviceusers "github.com/sariya23/manage_pr_service/internal/service/users"
@@ -44,12 +46,14 @@ func NewApp(ctx context.Context, logger *slog.Logger, config *cfg.Config) *App {
 	userService := serviceusers.NewUsersService(logger, userRepo, pullRequestRepo, teamRepo)
 	teamService := serviceteams.NewTeamsService(logger, teamRepo, userRepo)
 	pullRequestService := service_pull_request.NewPullRequestService(logger, pullRequestRepo, userRepo, teamRepo)
+	analyticsService := serviceanalytics.NewAnalyticsService(logger, pullRequestRepo)
 
 	// Implementations
 	debugImpl := apidebug.NewDebugImplementation()
 	userImpl := apiusers.NewUsersImplementation(logger, userService)
 	teamsImpl := apiteams.NewTeamsImplementation(logger, teamService)
 	pullRequestImpl := api_pull_requests.NewPullRequestImplementation(logger, pullRequestService)
+	analyticsImpl := analytics.NewAnalyticsImplementation(logger, analyticsService)
 
 	r := chi.NewRouter()
 	r.Route("/api", func(r chi.Router) {
@@ -68,6 +72,9 @@ func NewApp(ctx context.Context, logger *slog.Logger, config *cfg.Config) *App {
 			r.Post("/create", pullRequestImpl.Create)
 			r.Post("/merge", pullRequestImpl.Merge)
 			r.Post("/reassign", pullRequestImpl.Reassign)
+		})
+		r.Route("/analytics", func(r chi.Router) {
+			r.Get("/usersPRs", analyticsImpl.UsersPRs)
 		})
 	})
 	srv := server.NewServer(config.HTTPServerHost, config.HTTPServerPort, r)
