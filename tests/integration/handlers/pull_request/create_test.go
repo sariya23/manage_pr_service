@@ -9,7 +9,7 @@ import (
 
 	"github.com/brianvoe/gofakeit/v7"
 	"github.com/sariya23/manage_pr_service/tests/checkers"
-	httpcleint "github.com/sariya23/manage_pr_service/tests/clients/http"
+	httpclient "github.com/sariya23/manage_pr_service/tests/clients/http"
 	"github.com/sariya23/manage_pr_service/tests/factory"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +20,7 @@ import (
 // Успешное создание PullRequest
 func TestPullRequestCreate(t *testing.T) {
 	ctx := context.Background()
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -49,7 +49,7 @@ func TestPullRequestCreate(t *testing.T) {
 // TestPullRequestCreate_AuthorNotFound тест ручки /pullRequest/create
 // При попытке создать PR несуществующим пользователем, вернется ошибка
 func TestPullRequestCreate_AuthorNotFound(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	request := factory.PullRequestCreateRequest{}
 	request.RadnomInit("", "", "")
 	response := httpClient.PullRequestCreate(request)
@@ -59,7 +59,7 @@ func TestPullRequestCreate_AuthorNotFound(t *testing.T) {
 // TestPullRequestCreate_AlreadyExists тест ручки /pullRequest/create
 // При попытке создать PR с уже существующим айдишником, вернется ошибка
 func TestPullRequestCreate_AlreadyExists(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := random.RandInt(1, 3)
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -105,7 +105,7 @@ func TestPullRequestCreate_ValidationError(t *testing.T) {
 				PullRequestID: gofakeit.LetterN(32)},
 		},
 	}
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			response := httpClient.PullRequestCreate(c.request)

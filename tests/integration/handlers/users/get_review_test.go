@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/brianvoe/gofakeit/v7"
-	httpcleint "github.com/sariya23/manage_pr_service/tests/clients/http"
+	httpclient "github.com/sariya23/manage_pr_service/tests/clients/http"
 	"github.com/sariya23/manage_pr_service/tests/factory"
 	"github.com/sariya23/manage_pr_service/tests/helpers"
 	"github.com/sariya23/manage_pr_service/tests/helpers/random"
@@ -22,7 +22,7 @@ import (
 // Успешное получение ревью
 func TestUsersGetReview(t *testing.T) {
 	ctx := context.Background()
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	nUsers := 2
 	members := make([]factory.AddTeamRequestMemberDTO, 0, nUsers)
 	for range nUsers {
@@ -72,7 +72,7 @@ func TestUsersGetReview(t *testing.T) {
 // TestUsersGetReview тест на ручку /users/getReview
 // Несуществующий юзер
 func TestUsersGetReview_NonexistentUser(t *testing.T) {
-	httpClient := httpcleint.NewHTTPClient()
+	httpClient := httpclient.NewHTTPClient()
 	responseGet := httpClient.UsersGetReview(gofakeit.LetterN(32))
 	require.Equal(t, http.StatusNotFound, responseGet.StatusCode)
 }
