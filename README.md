@@ -46,8 +46,6 @@ Pull Request’ы внутри команды.
 ├── config                 # Файлы конфигурации
 │   ├── dev.env
 │   └── local.env
-├── deployments            # Докер файлы для разных окружений
-│   └── docker
 ├── go.mod
 ├── go.sum
 ├── internal
