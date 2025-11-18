@@ -17,9 +17,9 @@ services:
 
   pr_manage_migrations:
     build:
-      dockerfile: deployments/docker/local/Dockerfile
-      context: ../../..
       target: dev
+      context: .
+      dockerfile: Dockerfile
     environment:
       POSTGRES_USER: ${POSTGRES_USERNAME}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -30,12 +30,11 @@ services:
         condition: service_healthy
     command: sh -c "until pg_isready -h ${POSTGRES_HOST_INNER} -p ${POSTGRES_PORT}; do sleep 1; done; make service_migrate_inner ENV=local"
 
-
   pr_manage_app:
     build:
-      dockerfile: deployments/docker/local/Dockerfile
-      context: ../../..
       target: dev
+      context: .
+      dockerfile: Dockerfile
     restart: "always"
     ports:
       - "${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT}"
