@@ -1,3 +1,4 @@
+ENV_FILE = ./.env
 include ${ENV_FILE}
 
 # DEV
